@@ -19,11 +19,10 @@ Controller.extend(function AclStaticController (){
 	 * Render the login form (GET-only)
 	 */
 	this.loginForm = function loginForm(render) {
-
-		var i = 0;
-  		while (i < 1e6) i++;
-
-		render('acl/login');
+		render('acl/login', {authError: render.req.session.authError||false});
+		
+		// Remove any authError messages
+		delete render.req.session.authError;
 	};
 
 	/**
@@ -85,19 +84,30 @@ function allow(render, user) {
 
 	pr(user);
 
+	// Make sure we have a valid url to redirect to
+	var redirectUrl = render.req.session.whenAuthRedirect || alchemy.plugins.acl.redirect;
+
+	// If we still have nothing, go to the root
+	if (!redirectUrl) redirectUrl = '/';
+
 	// Store the user data in the session
 	render.req.session.user = user[config.username];
 
 	// Redirect to the correct url
-	render.redirect(render.req.session.whenAuthRedirect);
+	render.redirect(redirectUrl);
 
 	// Remove the redirect directive
 	delete render.req.session.whenAuthRedirect;
+
+	// Remove any authError messages
+	delete render.req.session.authError;
 }
 
 function deny(render) {
 
 	pr('Access denied!'.red.bold);
+
+	render.req.session.authError = 'Username/Password are not correct';
 
 	// Try logging in again
 	render.redirect('/login');

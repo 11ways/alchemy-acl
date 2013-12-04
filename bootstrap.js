@@ -12,6 +12,9 @@ var options = {
 	// The password field
 	password: 'password',
 
+	// The default url to redirect to
+	redirect: '/',
+
 	// The amount of rounds to process the salt
 	rounds: 10,
 
@@ -40,7 +43,9 @@ var viewSettings = {
 	baselayout: alchemy.plugins.acl.baselayout,
 	bodylayout: alchemy.plugins.acl.bodylayout,
 	bodyblock: alchemy.plugins.acl.bodyblock,
-	mainblock: alchemy.plugins.acl.mainblock
+	mainblock: alchemy.plugins.acl.mainblock,
+	username: alchemy.plugins.acl.username,
+	password: alchemy.plugins.acl.password
 };
 
 // Create route connections, which can be overridden

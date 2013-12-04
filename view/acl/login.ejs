@@ -2,23 +2,20 @@
 
 <% start(store('acl-view-setting').mainblock) %>
 <div class="container">
+	<div id="error">
+		<% if (authError) { %>
+			<%= authError %>
+		<% } %>
+	</div>
+
 	<% form.create('login', {id: 'AclLogin', action: '/acl/login'}) %>
 		<h2 class="form-signin-heading">Login</h2>
-		<div id="error"></div>
-		<div class="control-group">
-			<input type="text" class="input-block-level" placeholder="Username" name="data[Login][username]">
-		</div>
-		<div class="control-group">
-			<input type="password" class="input-block-level" placeholder="Password" name="data[Login][password]">
-		</div>
-		<button class="btn btn-large btn-primary" type="submit" id="login">Log in</button>
-	<% form.end('login') %>
+		<% form.input(store('acl-view-setting').username, {placeholder: 'Username'}) %>
+		<% form.input(store('acl-view-setting').password, {placeholder: 'Password', type: 'password'}) %>
+	<% form.end('login', {title: 'Log In'}) %>
 </div>
 
 <div>
-	
-	<% form.input('username', {placeholder: 'Username'}) %>
-	<% form.input('password') %>
 	
 </div>
 <style type="text/css">

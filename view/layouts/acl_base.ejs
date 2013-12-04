@@ -2,25 +2,7 @@
 <html>
 	<head>
 		<title></title>
-		<% script('/public/admin/js/jquery.min.js') -%>
-		<% script('/public/admin/js/history.js') -%>
-		<% script('/public/admin/js/jquery.jsonify.js') -%>
-		
-		<% style('/public/stylesheets/aclbase.css') -%>
-		<% style('/public/admin/js/jquery-ui.css') -%>
-		
-		<% script('/public/js/bootstrap/bootstrap-transition.js') %>
-		<% script('/public/js/bootstrap/bootstrap-alert.js') %>
-		<% script('/public/js/bootstrap/bootstrap-modal.js') %>
-		<% script('/public/js/bootstrap/bootstrap-dropdown.js') %>
-		<% script('/public/js/bootstrap/bootstrap-scrollspy.js') %>
-		<% script('/public/js/bootstrap/bootstrap-tab.js') %>
-		<% script('/public/js/bootstrap/bootstrap-tooltip.js') %>
-		<% script('/public/js/bootstrap/bootstrap-popover.js') %>
-		<% script('/public/js/bootstrap/bootstrap-button.js') %>
-		<% script('/public/js/bootstrap/bootstrap-collapse.js') %>
-		<% script('/public/js/bootstrap/bootstrap-carousel.js') %>
-		<% script('/public/js/bootstrap/bootstrap-typeahead.js') %>
+		<% asset.style('aclbase') %>
 	</head>
 	<body>
 		<% assign(store('acl-view-setting').bodyblock) %>

@@ -3,11 +3,11 @@
  *
  * @constructor
  *
- * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @author   Jelle De Loecker   <jelle@codedor.be>
  * @since    0.0.1
  * @version  0.0.1
  */
-Model.extend(function AclGroupModel (){
+Model.extend(function AclGroupModel(){
 
 	this.hasMany = {
 		ChildGroup: {

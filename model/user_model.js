@@ -26,11 +26,11 @@ Model.extend(function UserModel() {
 		this.parent();
 		
 		this.blueprint = {
-			nickname: {
+			username: {
 				type: 'String',
 				index: {
 					unique: true,
-					name: 'nickname',
+					name: 'username',
 					sparse: false,
 					order: 'asc'
 				}
