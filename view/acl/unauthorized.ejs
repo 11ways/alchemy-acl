@@ -1,7 +1,7 @@
-<% expands('layouts/acl_base') %>
+<% expands('layouts/' + store('acl-view-setting').bodylayout) %>
 
-<% start('acl-body') %>
+<% start(store('acl-view-setting').mainblock) %>
 <div class="container">
 	<h1>You are not authorized to view this page</h1>
 </div>
-<% end('acl-body') %>
+<% end(store('acl-view-setting').mainblock) %>

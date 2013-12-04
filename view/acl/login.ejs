@@ -1,6 +1,6 @@
-<% expands('layouts/acl_base') %>
+<% expands('layouts/' + store('acl-view-setting').bodylayout) %>
 
-<% start('acl-body') %>
+<% start(store('acl-view-setting').mainblock) %>
 <div class="container">
 	<% form.create('login', {id: 'AclLogin', action: '/acl/login'}) %>
 		<h2 class="form-signin-heading">Login</h2>
@@ -72,4 +72,4 @@
 		});
 	});
 </script>
-<% end('acl-body') %>
+<% end(store('acl-view-setting').mainblock) %>
