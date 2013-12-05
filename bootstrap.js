@@ -24,11 +24,17 @@ var options = {
 	// The name of the body layout
 	bodylayout: 'acl_body',
 
+	// The main layout
+	mainlayout: 'acl_main',
+
 	// The name of the body block
 	bodyblock: 'acl-base',
 
 	// The name of the main block
-	mainblock: 'acl-main'
+	mainblock: 'acl-main',
+
+	// The name of the content block
+	contentblock: 'acl-content'
 
 };
 
@@ -36,16 +42,18 @@ var options = {
 alchemy.plugins.acl = alchemy.inject(options, alchemy.plugins.acl);
 
 // Make sure the model name is correct
-alchemy.plugins.acl.model = alchemy.plugins.acl.model.modelName();
+options.model = options.model.modelName();
 
 // Get the view settings
 var viewSettings = {
-	baselayout: alchemy.plugins.acl.baselayout,
-	bodylayout: alchemy.plugins.acl.bodylayout,
-	bodyblock: alchemy.plugins.acl.bodyblock,
-	mainblock: alchemy.plugins.acl.mainblock,
-	username: alchemy.plugins.acl.username,
-	password: alchemy.plugins.acl.password
+	baselayout: alchemy.layoutify(options.baselayout),
+	bodylayout: alchemy.layoutify(options.bodylayout),
+	mainlayout: alchemy.layoutify(options.mainlayout),
+	bodyblock: options.bodyblock,
+	mainblock: options.mainblock,
+	contentblock: options.contentblock,
+	username: options.username,
+	password: options.password
 };
 
 // Create route connections, which can be overridden
