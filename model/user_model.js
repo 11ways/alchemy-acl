@@ -35,7 +35,12 @@ Model.extend(function UserModel() {
 					order: 'asc'
 				}
 			},
-			name: 'String',
+			name: {
+				type: 'String',
+				rules: {
+					notempty: {message: 'This field should not be empty!'}
+				}
+			},
 			password: 'String'
 		};
 	};
