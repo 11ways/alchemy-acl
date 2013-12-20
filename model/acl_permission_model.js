@@ -12,78 +12,83 @@ Model.extend(function AclPermissionModel() {
 	this.types = alchemy.shared('Acl.types');
 
 	this.targets = {
-		everyone: 'Everyone',
-		loggedout: 'Logged out',
-		registered: 'Registered',
-		user: 'User',
-		group: 'Group'
+		everyone: __('acl', 'Everyone'),
+		loggedout: __('acl', 'Logged out'),
+		registered: __('acl', 'Registered'),
+		user: __('acl', 'User'),
+		group: __('acl', 'Group')
 	};
 
-	this.blueprint = {
-		// The target audience
-		target: {
-			type: 'String',
-			index: {
-				unique: true,
-				name: 'target_name'
-			},
-		},
-		// The target user (if applicable)
-		target_user: {
-			type: 'ObjectId',
-			index: {
-				unique: true,
-				name: 'target_name'
-			},
-		},
-		// The target group (if applicable)
-		target_group: {
-			type: 'ObjectId',
-			index: {
-				unique: true,
-				name: 'target_name'
-			},
-		},
-		// What to filter
-		type: {
-			type: 'String',
-			index: {
-				unique: true,
-				name: 'target_name',
-			}
-		},
-		// First condition
-		parent_name: {
-			type: 'String',
-			index: {
-				unique: true,
-				name: 'target_name',
-			}
-		},
-		// Second condition
-		child_name: {
-			type: 'String',
-			index: {
-				unique: true,
-				name: 'target_name',
-			}
-		},
-		// Allow access?
-		allow: {
-			type: 'Boolean',
-			default: null
-		},
-		// The order of execution
-		order: {
-			type: 'Number',
-			default: 10
-		},
-		// Halt further checks?
-		halt: {
-			type: 'Boolean',
-			default: false
-		}
+	this.preInit = function preInit() {
 
+		this.parent();
+
+		this.blueprint = {
+			// The target audience
+			target: {
+				type: 'String',
+				index: {
+					unique: true,
+					name: 'target_name'
+				},
+			},
+			// The target user (if applicable)
+			target_user: {
+				type: 'ObjectId',
+				index: {
+					unique: true,
+					name: 'target_name'
+				},
+			},
+			// The target group (if applicable)
+			target_group: {
+				type: 'ObjectId',
+				index: {
+					unique: true,
+					name: 'target_name'
+				},
+			},
+			// What to filter
+			type: {
+				type: 'String',
+				index: {
+					unique: true,
+					name: 'target_name',
+				}
+			},
+			// First condition
+			parent_name: {
+				type: 'String',
+				index: {
+					unique: true,
+					name: 'target_name',
+				}
+			},
+			// Second condition
+			child_name: {
+				type: 'String',
+				index: {
+					unique: true,
+					name: 'target_name',
+				}
+			},
+			// Allow access?
+			allow: {
+				type: 'Boolean',
+				default: null
+			},
+			// The order of execution
+			order: {
+				type: 'Number',
+				default: 10
+			},
+			// Halt further checks?
+			halt: {
+				type: 'Boolean',
+				default: false
+			}
+
+		};
 	};
 
 	/**

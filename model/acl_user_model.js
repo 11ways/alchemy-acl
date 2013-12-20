@@ -9,28 +9,33 @@
  */
 Model.extend(function AclUserModel (){
 
-	this.belongsTo = {
-		AclGroup: {
-			modelName: 'AclGroup',
-			foreignKey: 'acl_group_id'
-		}
-	};
+	this.preInit = function preInit() {
 
-	this.blueprint = {
-		user_id: {
-			type: 'ObjectId',
-			index: {
-				unique: true,
-				name: 'acl_group_membership',
+		this.parent();
+
+		this.belongsTo = {
+			AclGroup: {
+				modelName: 'AclGroup',
+				foreignKey: 'acl_group_id'
 			}
-		},
-		acl_group_id: {
-			type: 'ObjectId',
-			index: {
-				unique: true,
-				name: 'acl_group_membership',
+		};
+
+		this.blueprint = {
+			user_id: {
+				type: 'ObjectId',
+				index: {
+					unique: true,
+					name: 'acl_group_membership',
+				}
+			},
+			acl_group_id: {
+				type: 'ObjectId',
+				index: {
+					unique: true,
+					name: 'acl_group_membership',
+				}
 			}
-		}
+		};
 	};
 	
 });

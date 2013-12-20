@@ -9,32 +9,36 @@
  */
 Model.extend(function AclGroupModel(){
 
-	this.hasMany = {
-		ChildGroup: {
-			modelName: 'AclGroup',
-			foreignKey: 'parent_group_id'
-		},
-		AclUser: {
-			modelName: 'AclUser',
-			foreignKey: 'acl_group_id'
-		}
-	};
+	this.preInit = function preInit() {
 
-	this.blueprint = {
-		name: {
-			type: 'String',
-			index: {
-				unique: true,
-				name: 'acl_group_name',
+		this.parent();
+
+		this.hasMany = {
+			ChildGroup: {
+				modelName: 'AclGroup',
+				foreignKey: 'parent_group_id'
+			},
+			AclUser: {
+				modelName: 'AclUser',
+				foreignKey: 'acl_group_id'
 			}
-		},
-		parent_group_id: {
-			type: 'ObjectId',
-			index: {
-				unique: true,
-				name: 'acl_group_name',
+		};
+
+		this.blueprint = {
+			name: {
+				type: 'String',
+				index: {
+					unique: true,
+					name: 'acl_group_name',
+				}
+			},
+			parent_group_id: {
+				type: 'ObjectId',
+				index: {
+					unique: true,
+					name: 'acl_group_name',
+				}
 			}
-		}
+		};
 	};
-	
 });
