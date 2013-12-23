@@ -13,6 +13,13 @@ Model.extend(function AclGroupModel(){
 
 		this.parent();
 
+		this.belongsTo = {
+			ParentGroup: {
+				modelName: 'AclGroup',
+				foreignKey: 'parent_group_id'
+			}
+		};
+
 		this.hasMany = {
 			ChildGroup: {
 				modelName: 'AclGroup',

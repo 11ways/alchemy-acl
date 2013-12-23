@@ -23,6 +23,17 @@ Model.extend(function AclPermissionModel() {
 
 		this.parent();
 
+		this.belongsTo = {
+			TargetUser: {
+				modelName: 'User',
+				foreignKey: 'target_user'
+			},
+			TargetGroup: {
+				modelName: 'AclGroup',
+				foreignKey: 'target_group'
+			}
+		};
+
 		this.blueprint = {
 			// The target audience
 			target: {

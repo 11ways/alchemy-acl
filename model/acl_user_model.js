@@ -17,6 +17,10 @@ Model.extend(function AclUserModel (){
 			AclGroup: {
 				modelName: 'AclGroup',
 				foreignKey: 'acl_group_id'
+			},
+			User: {
+				modelName: 'User',
+				foreignKey: 'user_id'
 			}
 		};
 
