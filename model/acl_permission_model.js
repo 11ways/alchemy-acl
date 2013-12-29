@@ -37,7 +37,7 @@ Model.extend(function AclPermissionModel() {
 		this.blueprint = {
 			// The target audience
 			target: {
-				type: 'String',
+				type: 'Enum',
 				index: {
 					unique: true,
 					name: 'target_name'
@@ -61,7 +61,7 @@ Model.extend(function AclPermissionModel() {
 			},
 			// What to filter
 			type: {
-				type: 'String',
+				type: 'Enum',
 				index: {
 					unique: true,
 					name: 'target_name',
