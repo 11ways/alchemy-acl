@@ -49,7 +49,7 @@ Model.extend(function AclPermissionModel() {
 				index: {
 					unique: true,
 					name: 'target_name'
-				},
+				}
 			},
 			// The target group (if applicable)
 			target_group: {
