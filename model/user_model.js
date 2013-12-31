@@ -41,7 +41,14 @@ Model.extend(function UserModel() {
 					notempty: {message: 'This field should not be empty!'}
 				}
 			},
-			password: 'String'
+			password: {
+				type: 'Password',
+				rules: {
+					notempty: {
+						mesage: 'A password is required!'
+					}
+				}
+			}
 		};
 	};
 });
