@@ -50,10 +50,29 @@ Controller.extend(function AclStaticController (){
 
 			Model.get(config.model).find('first', {conditions: conditions}, function(err, record) {
 
+				var UserData,
+				    i;
+
 				if (record) {
 
-					var UserData = record[config.model];
-					
+					pr(record, true)
+
+					UserData = record[config.model];
+
+					// Delete the entry from the record
+					delete record[config.model];
+
+					// And store the rest back under the user
+					UserData.extra = record;
+
+					// Make sure there is a groups array
+					UserData.groups = {};
+
+					// Add the name of the group
+					for (i = 0; i < record.AclGroup.length; i++) {
+						UserData.groups[record.AclGroup[i]._id+''] = record.AclGroup[i].name;
+					}
+
 					bcrypt.compare(password, UserData.password, function(err, match) {
 						if (match) {
 							allow(render, UserData);
@@ -82,16 +101,14 @@ Controller.extend(function AclStaticController (){
 
 function allow(render, user) {
 
-	pr(user);
-
 	// Make sure we have a valid url to redirect to
 	var redirectUrl = render.req.session.whenAuthRedirect || alchemy.plugins.acl.redirect;
 
 	// If we still have nothing, go to the root
 	if (!redirectUrl) redirectUrl = '/';
 
-	// Store the user data in the session
-	render.req.session.user = user[config.username];
+	// Store the complete user data in the session
+	render.req.session.user = user;
 
 	// Redirect to the correct url
 	render.redirect(redirectUrl);

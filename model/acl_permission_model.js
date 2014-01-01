@@ -107,6 +107,8 @@ Model.extend(function AclPermissionModel() {
 	 */
 	this.getUserPermissions = function getUserPermissions(user, callback) {
 
+		pr(user, true)
+
 		this.find('all', function(err, items) {
 
 			var rule, use, rules = [];
@@ -125,7 +127,7 @@ Model.extend(function AclPermissionModel() {
 				} else if (rule.target === 'user') {
 					if (user._id == rule.target_user) use = true;
 				} else if (rule.target === 'group') {
-					if (rule.target_group in user.groups) use = true;
+					if (user && user.groups && rule.target_group in user.groups) use = true;
 				}
 
 				if (use) {
@@ -134,7 +136,6 @@ Model.extend(function AclPermissionModel() {
 			}
 
 			rules.sort(sortRules);
-			pr(rules);
 
 			callback(rules);
 		});
@@ -153,6 +154,10 @@ Model.extend(function AclPermissionModel() {
 		    eroute = req.route,
 		    aroute = req.alchemyRoute,
 		    that   = this;
+
+		if (!user) {
+			user = false;
+		}
 
 		// Get all the rules applying to this user
 		this.getUserPermissions(user, function(rules) {
@@ -193,9 +198,9 @@ Model.extend(function AclPermissionModel() {
 				}
 			} else {
 				if (allow) {
-					log.acl('User ' + user + ' is ' + 'allowed'.bold.green + ' access to url ' + req.originalUrl);
+					log.acl('User ' + user.name + ' is ' + 'allowed'.bold.green + ' access to url ' + req.originalUrl);
 				} else {
-					log.acl('User ' + user + ' is ' + 'denied'.bold.red + ' access to url ' + req.originalUrl);
+					log.acl('User ' + user.name + ' is ' + 'denied'.bold.red + ' access to url ' + req.originalUrl);
 				}
 			}
 

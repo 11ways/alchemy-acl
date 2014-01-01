@@ -25,9 +25,16 @@ Model.extend(function AclGroupModel(){
 				modelName: 'AclGroup',
 				foreignKey: 'parent_group_id'
 			},
-			AclUser: {
-				modelName: 'AclUser',
-				foreignKey: 'acl_group_id'
+			GroupPermission: {
+				modelName: 'AclPermission',
+				foreignKey: 'target_group'
+			}
+		};
+
+		this.hasAndBelongsToMany = {
+			User: {
+				modelName: 'User',
+				associationKey: 'acl_group_id'
 			}
 		};
 

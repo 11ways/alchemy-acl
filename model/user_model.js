@@ -24,6 +24,13 @@ Model.extend(function UserModel() {
 	this.preInit = function preInit() {
 
 		this.parent();
+
+		this.hasAndBelongsToMany = {
+			AclGroup: {
+				modelName: 'AclGroup',
+				foreignKey: 'acl_group_id'
+			}
+		};
 		
 		this.blueprint = {
 			username: {
