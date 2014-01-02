@@ -25,6 +25,8 @@ Model.extend(function UserModel() {
 
 		this.parent();
 
+		this.displayField = 'username';
+
 		this.hasAndBelongsToMany = {
 			AclGroup: {
 				modelName: 'AclGroup',
