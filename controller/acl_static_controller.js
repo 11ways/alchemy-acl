@@ -53,8 +53,9 @@ Controller.extend(function AclStaticController (){
 				var UserData,
 				    i;
 
-				if (record) {
+				if (record.length) {
 
+					record = record[0];
 					pr(record, true)
 
 					UserData = record[config.model];
