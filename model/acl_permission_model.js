@@ -169,6 +169,10 @@ Model.extend(function AclPermissionModel() {
 				// Reference to the current rule
 				rule = rules[i];
 
+				// Replace placeholders
+				rule.parent_name = alchemy.fillPlaceholders(rule.parent_name, alchemy.plugins.acl.placeholders);
+				rule.child_name = alchemy.fillPlaceholders(rule.child_name, alchemy.plugins.acl.placeholders);
+
 				// Get the acltype
 				acltype = that.types[rule.type];
 

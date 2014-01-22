@@ -34,7 +34,10 @@ var options = {
 	mainblock: 'acl-main',
 
 	// The name of the content block
-	contentblock: 'acl-content'
+	contentblock: 'acl-content',
+
+	// Placeholder variables to use in certain strings
+	placeholders: {}
 
 };
 
