@@ -97,6 +97,11 @@ Controller.extend(function AclStaticController (){
 	this.unauthorized = function unauthorized(render) {
 		render('acl/unauthorized');
 	};
+	
+	this.logout = function logout(render){
+		delete render.req.session.user;
+		render.redirect('/');
+	};
 
 });
 
