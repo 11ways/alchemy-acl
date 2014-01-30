@@ -86,6 +86,20 @@ Model.extend(function AclDataPermissionModel() {
 				default: 10
 			}
 		};
+
+		/**
+		 * Chimera settings
+		 */
+		this.modelIndex = {
+			fields: ['target', 'target_model', 'target_user', 'target_group', 'type', 'order']
+		};
+
+		this.modelEdit = {
+			general: {
+				title: __('chimera', 'General'),
+				fields: ['target', 'target_model', 'target_user', 'target_group', 'type', 'settings', 'order']
+			}
+		};
 	};
 
 	/**

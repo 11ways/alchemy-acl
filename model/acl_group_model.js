@@ -13,6 +13,11 @@ Model.extend(function AclGroupModel(){
 
 		this.parent();
 
+		this.sort = {
+			root: 'DESC',
+			weight: 'DESC'
+		};
+
 		this.belongsTo = {
 			ParentGroup: {
 				modelName: 'AclGroup',
@@ -52,6 +57,28 @@ Model.extend(function AclGroupModel(){
 					unique: true,
 					name: 'acl_group_name',
 				}
+			},
+			weight: {
+				type: 'Number',
+				default: 10
+			},
+			root: {
+				type: 'Boolean',
+				default: false
+			}
+		};
+
+		/**
+		 * Chimera settings
+		 */
+		this.modelIndex = {
+			fields: ['name', 'weight', 'root', 'parent_group_id']
+		};
+
+		this.modelEdit = {
+			general: {
+				title: __('chimera', 'General'),
+				fields: ['name', 'weight', 'root', 'parent_group_id']
 			}
 		};
 	};
