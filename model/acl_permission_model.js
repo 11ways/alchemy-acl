@@ -10,14 +10,7 @@
 Model.extend(function AclPermissionModel() {
 
 	this.types = alchemy.shared('Acl.types');
-
-	this.targets = {
-		everyone: __('acl', 'Everyone'),
-		loggedout: __('acl', 'Logged out'),
-		registered: __('acl', 'Registered'),
-		user: __('acl', 'User'),
-		group: __('acl', 'Group')
-	};
+	this.targets = alchemy.shared('Acl.targets');
 
 	this.preInit = function preInit() {
 
@@ -106,8 +99,6 @@ Model.extend(function AclPermissionModel() {
 	 * Get all the rules for the given user
 	 */
 	this.getUserPermissions = function getUserPermissions(user, callback) {
-
-		pr(user, true)
 
 		this.find('all', function(err, items) {
 
@@ -202,9 +193,9 @@ Model.extend(function AclPermissionModel() {
 				}
 			} else {
 				if (allow) {
-					log.acl('User ' + user.name + ' is ' + 'allowed'.bold.green + ' access to url ' + req.originalUrl);
+					log.acl('User ' + user.username + ' is ' + 'allowed'.bold.green + ' access to url ' + req.originalUrl);
 				} else {
-					log.acl('User ' + user.name + ' is ' + 'denied'.bold.red + ' access to url ' + req.originalUrl);
+					log.acl('User ' + user.username + ' is ' + 'denied'.bold.red + ' access to url ' + req.originalUrl);
 				}
 			}
 
