@@ -93,5 +93,9 @@ alchemy.on('render.callback', function(render, callback) {
 		render.store('acl-view-setting', viewSettings);
 	}
 	
+	if(render.req.session.user){
+		render.viewVars.name = render.req.session.user.name;
+	}
+	
 	callback();
 });
