@@ -13,6 +13,8 @@ Model.extend(function AclGroupModel(){
 
 		this.parent();
 
+		this.displayField = 'name';
+
 		this.sort = {
 			root: 'DESC',
 			weight: 'DESC'
