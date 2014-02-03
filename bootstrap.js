@@ -88,13 +88,17 @@ alchemy.addMiddleware(99, 'acl-routes', function(req, res, next){
 // Send the acl layout options to the client
 alchemy.on('render.callback', function(render, callback) {
 
+	var user = render.req.session.user,
+	    display = __('acl', 'Unnamed User');
+
 	// Only send this data on the initial pageload
 	if (!render.ajax) {
 		render.store('acl-view-setting', viewSettings);
 	}
 	
-	if(render.req.session.user){
-		render.viewVars.name = render.req.session.user.name;
+	if(user){
+		display = user.name || user.email || user.username;
+		render.viewVars.name = display;
 	}
 	
 	callback();
