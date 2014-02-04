@@ -37,7 +37,13 @@ var options = {
 	contentblock: 'acl-content',
 
 	// Placeholder variables to use in certain strings
-	placeholders: {}
+	placeholders: {},
+
+	// The super user group id
+	SuperUserGroupId: alchemy.ObjectId('52efff0000A1C00001000001'),
+
+	// The super user id
+	SuperUserId: alchemy.ObjectId('52efff0000A1C00000000000')
 
 };
 
@@ -103,3 +109,60 @@ alchemy.on('render.callback', function(render, callback) {
 	
 	callback();
 });
+
+alchemy.sputnik.after('datasources', function() {
+	
+	var AclGroup    = Model.get('AclGroup'),
+	    User        = Model.get('User'),
+	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
+	    SuperUserId      = alchemy.plugins.acl.SuperUserId;
+
+	// Make sure the SuperUser group exists
+	AclGroup.find('first', {conditions: {_id: SuperUserGroupId}}, function(err, result) {
+
+		// If no result was found, create one!
+		if (!result.length) {
+			var data = {
+				AclGroup: {
+					_id: SuperUserGroupId,
+					name: 'Superuser',
+					root: true,
+					weight: 10001
+				}
+			};
+
+			// Save the data
+			AclGroup.save(data, function(err, result) {
+				if (err) {
+					log.error('Failed to create Superusers ACL group:');
+					log.error(err);
+				}
+			});
+
+		}
+	});
+
+	// Make sure the SuperUser exists!
+	User.find('first', {conditions: {_id: SuperUserId}}, function(err, result) {
+
+		if (!result.length) {
+			var data = {
+				User: {
+					username: 'admin',
+					name: 'Superuser',
+					_id: SuperUserId,
+					acl_group_id: [SuperUserGroupId]
+				}
+			};
+
+			User.save(data, function(err, result) {
+				if (err) {
+					log.error('Failed to create superuser!');
+				}
+			});
+		}
+
+	});
+	
+});
+

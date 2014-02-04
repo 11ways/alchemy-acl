@@ -21,9 +21,13 @@ Model.extend(function AclGroupModel(){
 		};
 
 		this.belongsTo = {
-			ParentGroup: {
+			InheritFromGroup: {
 				modelName: 'AclGroup',
-				foreignKey: 'parent_group_id'
+				foreignKey: 'inherit_from_group_id'
+			},
+			ForfeitToGroup: {
+				modelName: 'AclGroup',
+				foreignKey: 'forfeit_to_group_id',
 			}
 		};
 
@@ -53,12 +57,15 @@ Model.extend(function AclGroupModel(){
 					name: 'acl_group_name',
 				}
 			},
-			parent_group_id: {
+			inherit_from_group_id: {
 				type: 'ObjectId',
 				index: {
 					unique: true,
 					name: 'acl_group_name',
 				}
+			},
+			forfeit_to_group_id: {
+				type: 'ObjectId'
 			},
 			weight: {
 				type: 'Number',
@@ -74,14 +81,49 @@ Model.extend(function AclGroupModel(){
 		 * Chimera settings
 		 */
 		this.modelIndex = {
-			fields: ['name', 'weight', 'root', 'parent_group_id']
+			fields: ['name', 'weight', 'root', 'inherit_from_group_id', 'forfeit_to_group_id']
 		};
 
 		this.modelEdit = {
 			general: {
 				title: __('chimera', 'General'),
-				fields: ['name', 'weight', 'root', 'parent_group_id']
+				fields: ['name', 'weight', 'root', 'inherit_from_group_id', 'forfeit_to_group_id']
 			}
 		};
+	};
+
+	/**
+	 * Make sure every group forfeits its right to another group,
+	 * unless it's the highest group (superusers)
+	 */
+	this.beforeSave = function beforeSave(next, record, options) {
+
+		var that = this;
+
+		this.parent('beforeSave', null, function() {
+
+			if (!record.forfeit_to_group_id && (record._id && 'forfeit_to_group_id' in record)) {
+
+				that.find('first', {sort: {weight: 'DESC'}}, function (err, item) {
+
+					var id;
+
+					if (item.length) {
+						// Get the id of the highest found item
+						id = item[0].AclGroup._id;
+
+						// Make sure it doesn't forfeit to itself
+						if ((''+id) != record._id) {
+							record.forfeit_to_group_id = item[0].AclGroup._id;
+						}
+					}
+					
+					next();
+				});
+			} else {
+				next();
+			}
+
+		}, record, options);
 	};
 });

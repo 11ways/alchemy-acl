@@ -93,6 +93,39 @@ Model.extend(function AclPermissionModel() {
 			}
 
 		};
+
+		this.modelEdit = {
+			general: {
+				title: __('chimera', 'General'),
+				fields: [
+					'target',
+					'target_user',
+					'target_group',
+					'type',
+					'parent_name',
+					'child_name',
+					'allow',
+					'order',
+					'halt'
+				]
+			}
+		};
+
+		this.modelIndex = {
+			fields: [
+				'_id',
+				'created',
+				'target',
+				'target_user',
+				'target_group',
+				'type',
+				'parent_name',
+				'child_name',
+				'allow',
+				'order',
+				'halt'
+			]
+		};
 	};
 
 	/**

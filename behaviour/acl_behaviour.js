@@ -56,7 +56,7 @@ Behaviour.extend(function AclBehaviour (){
 	
 	this.afterFind = function afterFind(next, err, results, primary, alias) {
 
-		this.preparePermissionType(next, results, function tasker(next_task, type, item) {
+		this.preparePermissionType(next, results, alias, function tasker(next_task, type, item) {
 			type.afterFind(next_task, null, item, primary, alias);
 		});
 
@@ -68,7 +68,12 @@ Behaviour.extend(function AclBehaviour (){
 		});
 	};
 
-	this.preparePermissionType = function preparePermissionType(next, results, tasker) {
+	this.preparePermissionType = function preparePermissionType(next, results, alias, tasker) {
+
+		if (typeof alias == 'function') {
+			tasker = alias;
+			alias = undefined;
+		}
 
 		// If the render object isn't available, do nothing
 		if (!this.render) {
@@ -118,7 +123,57 @@ Behaviour.extend(function AclBehaviour (){
 				}
 			}
 
-			async.series(tasks, function(err, results) {
+			async.series(tasks, function(err, f_results) {
+
+				// @todo: this should really be structured better,
+				// but right now it just needs to work
+				if (alias) {
+					var items = results,
+					    entry,
+					    item,
+					    _acl,
+					    i,
+					    j;
+
+					for (i = 0; i < items.length; i++) {
+						item = items[i];
+
+						item = item[alias];
+
+						if (!Array.isArray(item)) {
+							item = [item];
+						}
+
+						for (j = 0; j < item.length; j++) {
+							entry = item[j];
+
+							if (!entry) {
+								continue;
+							}
+
+							_acl = entry._acl;
+
+							if (!_acl && entry.settings) {
+								_acl = entry.settings._acl;
+							}
+
+							if (_acl && _acl.allow_groups) {
+								if (!alchemy.areIn('or', _acl.allow_groups, user.groups)) {
+									
+									// Remove the item from the array, and detract the counter by 1
+									item.splice(j, 1);
+									j--;
+
+									// If the original item wasn't an array, remove it there too
+									if (!Array.isArray(items[i][alias])) {
+										delete items[i][alias];
+									}
+								}
+							}
+						}
+					}
+				}
+
 				next();
 			});
 
