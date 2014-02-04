@@ -103,7 +103,10 @@ alchemy.on('render.callback', function(render, callback) {
 	}
 	
 	if(user){
-		display = user.name || user.email || user.username;
+		if(user.first_name && user.last_name){
+			user.fullname = user.first_name + ' ' + user.last_name;
+		}
+		display = user.fullname || user.name || user.username || user.email;
 		render.viewVars.name = display;
 	}
 	
