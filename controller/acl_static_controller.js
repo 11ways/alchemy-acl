@@ -30,9 +30,6 @@ Controller.extend(function AclStaticController (){
 	 */
 	this.loginUser =  function loginUser(render) {
 
-		pr('Logging in the user');
-		pr(render.req.body)
-
 		var data = render.req.body.data,
 		    username,
 		    password,
