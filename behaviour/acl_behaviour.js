@@ -143,7 +143,7 @@ Behaviour.extend(function AclBehaviour (){
 				allow = true;
 
 				// If the user is a superuser, do nothing
-				if (user.groups[String(alchemy.plugins.acl.SuperUserGroupId)]) {
+				if (user && user.groups[String(alchemy.plugins.acl.SuperUserGroupId)]) {
 					return next();
 				}
 
