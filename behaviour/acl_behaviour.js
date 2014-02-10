@@ -81,7 +81,7 @@ Behaviour.extend(function AclBehaviour (){
 					}
 
 					type.doesTypeApply(that.model, function(apply) {
-						
+
 						// If apply is true, add it to the array of types to use
 						if (apply) {
 							useTypes.push(type.augment({model: that.model, render: that.render}));
