@@ -216,33 +216,67 @@ Behaviour.extend(function AclBehaviour (){
 	this.beforeSave = function beforeSave(next, record, options) {
 
 		var that  = this,
-		    tasks = [];
+		    tasks = [],
+		    getOriginal = {};
 
 		if (!this.render) {
 			return next();
 		}
 
-		// Get the augmented types to apply
-		this.getTypesToApply(function(types) {
+		if (record._id) {
+			getOriginal.original = function(next) {
 
-			var i;
+				// Get an unaugmented model
+				var model = Model.get(that.model.modelName);
 
-			for (i = 0; i < types.length; i++) {
-				(function(type){
+				model.find('first', {conditions: {_id: record._id}}, function(err, result) {
 
-					if (type.beforeSave) {
-						tasks[tasks.length] = function (next_task) {
-							type.beforeSave(record, options, next_task);
-						};
+					if (result.length) {
+						next(result[0][that.model.modelName]);
+					} else {
+						next();
 					}
-					
-				}(types[i]));
+
+				});
 			}
-			
-			// Start executing all the types
-			async.parallel(tasks, function() {
-				next();
+		}
+
+		// Get the original record if it exists
+		async.series(getOriginal, function(result) {
+
+			var original;
+
+			if (result) {
+				original = result;
+			} else {
+				original = {};
+			}
+
+			// Get the augmented types to apply
+			that.getTypesToApply(function(types) {
+
+				var i;
+
+				for (i = 0; i < types.length; i++) {
+					(function(type){
+
+						if (type.beforeSave) {
+							tasks[tasks.length] = function (next_task) {
+								type.beforeSave(original, record, options, next_task);
+							};
+						}
+						
+					}(types[i]));
+				}
+				
+				// Start executing all the types
+				async.parallel(tasks, function() {
+					next();
+				});
 			});
+
 		});
+
+		
 	};
 });
