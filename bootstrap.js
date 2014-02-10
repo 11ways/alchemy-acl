@@ -39,12 +39,17 @@ var options = {
 	// Placeholder variables to use in certain strings
 	placeholders: {},
 
+	// The everyone group id
+	EveryoneGroupId: alchemy.ObjectId('52efff0000A1C00001000000'),
+
+	// The logged in user group id
+	LoggedInGroupId: alchemy.ObjectId('52efff0000A1C00001000003'),
+
 	// The super user group id
 	SuperUserGroupId: alchemy.ObjectId('52efff0000A1C00001000001'),
 
 	// The super user id
 	SuperUserId: alchemy.ObjectId('52efff0000A1C00000000000')
-
 };
 
 // Inject the user-overridden options
@@ -52,6 +57,38 @@ alchemy.plugins.acl = alchemy.inject(options, alchemy.plugins.acl);
 
 // Make sure the model name is correct
 options.model = options.model.modelName();
+
+// Ensure these groups exist
+var ensureGroups = [];
+
+// The everyone group
+ensureGroups[ensureGroups.length] = {
+	_id: options.EveryoneGroupId,
+	name: 'Everyone',
+	special: true,
+	special_command: 'everyone',
+	forfeit_to_group_id: options.LoggedInGroupId,
+	weight: 1
+};
+
+// The logged in user group
+ensureGroups[ensureGroups.length] = {
+	_id: options.LoggedInGroupId,
+	name: 'Logged in',
+	special: true,
+	special_command: 'loggedin',
+	forfeit_to_group_id: options.SuperUserGroupId,
+	weight: 5
+};
+
+// The super user group
+ensureGroups[ensureGroups.length] = {
+	_id: options.SuperUserGroupId,
+	name: 'Superuser',
+	root: true,
+	weight: 10001
+};
+
 
 // Get the view settings
 var viewSettings = {
@@ -86,6 +123,7 @@ alchemy.connect('ACL::unauthorized', '/acl/unauthorized', {
 	method: 'get',
 	order: 20
 });
+
 // Add the middleware to intercept the routes
 alchemy.addMiddleware(99, 'acl-routes', function(req, res, next){
 	Model.get('AclPermission').checkRequest(req, res, next);
@@ -120,52 +158,15 @@ alchemy.sputnik.after('datasources', function() {
 	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
 	    SuperUserId      = alchemy.plugins.acl.SuperUserId;
 
-	// Make sure the SuperUser group exists
-	AclGroup.find('first', {conditions: {_id: SuperUserGroupId}}, function(err, result) {
+	// Make sure the required ACL groups exist
+	AclGroup.ensureIds(ensureGroups);
 
-		// If no result was found, create one!
-		if (!result.length) {
-			var data = {
-				AclGroup: {
-					_id: SuperUserGroupId,
-					name: 'Superuser',
-					root: true,
-					weight: 10001
-				}
-			};
-
-			// Save the data
-			AclGroup.save(data, function(err, result) {
-				if (err) {
-					log.error('Failed to create Superusers ACL group:');
-					log.error(err);
-				}
-			});
-
-		}
+	// Make sure the super user exists
+	User.ensureIds({
+		_id: SuperUserId,
+		username: 'admin',
+		name: 'Superuser',
+		acl_group_id: [SuperUserGroupId]
 	});
-
-	// Make sure the SuperUser exists!
-	User.find('first', {conditions: {_id: SuperUserId}}, function(err, result) {
-
-		if (!result.length) {
-			var data = {
-				User: {
-					username: 'admin',
-					name: 'Superuser',
-					_id: SuperUserId,
-					acl_group_id: [SuperUserGroupId]
-				}
-			};
-
-			User.save(data, function(err, result) {
-				if (err) {
-					log.error('Failed to create superuser!');
-				}
-			});
-		}
-
-	});
-	
 });
 

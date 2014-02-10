@@ -53,120 +53,147 @@ Behaviour.extend(function AclBehaviour (){
 		this.modelName = model.modelName;
 	};
 
-	
-	this.afterFind = function afterFind(next, err, results, primary, alias) {
+	/**
+	 * Get all the rule types that can be applied
+	 *
+	 * @author   Jelle De Loecker   <jelle@codedor.be>
+	 * @since    0.0.1
+	 * @version  0.0.1
+	 */
+	this.getTypesToApply = function getTypesToApply(callback) {
 
-		this.preparePermissionType(next, results, alias, function tasker(next_task, type, item) {
-			type.afterFind(next_task, null, item, primary, alias);
-		});
+		var AclRule   = Model.get('AclRule'),
+		    ruleTypes = AclRule.getTypesByDomain('behaviour'),
+		    tasks     = [],
+		    that      = this,
+		    useTypes  = [],
+		    i;
 
-	};
+		for (i = 0; i < ruleTypes.length; i++) {
 
-	this.beforeSave = function beforeSave(next, record, options) {
-		this.preparePermissionType(next, record, function tasker(next_task, type, item) {
-			type.beforeSave(next_task, item, options);
-		});
-	};
+			(function(type) {
 
-	this.preparePermissionType = function preparePermissionType(next, results, alias, tasker) {
+				tasks[tasks.length] = function(next_task) {
 
-		if (typeof alias == 'function') {
-			tasker = alias;
-			alias = undefined;
+					// Make sure the type has the method to check if it applies
+					if (!type.doesTypeApply) {
+						return next_task();
+					}
+
+					type.doesTypeApply(that.model, function(apply) {
+						
+						// If apply is true, add it to the array of types to use
+						if (apply) {
+							useTypes.push(type.augment({model: that.model, render: that.render}));
+						}
+
+						next_task();
+					});
+				};
+
+			}(ruleTypes[i]));
 		}
 
-		// If the render object isn't available, do nothing
+		async.parallel(tasks, function() {
+			callback(useTypes);
+		});
+	};
+
+	/**
+	 * Launch the afterFind methods of the rule types, if they are defined
+	 *
+	 * @author   Jelle De Loecker   <jelle@codedor.be>
+	 * @since    0.0.1
+	 * @version  0.0.1
+	 */
+	this.afterFind = function afterFind(next, err, results, primary, alias) {
+
+		var that  = this,
+		    tasks = [],
+		    user;
+
 		if (!this.render) {
 			return next();
 		}
 
-		var user = this.render.req.session.user || false,
-		    Permission = Model.get('AclDataPermission'),
-		    that = this;
+		user = that.render.req.session.user;
 
-		// Make sure the results object is an array
-		if (!Array.isArray(results)) {
-			results = [results];
-		}
+		// Get the augmented types to apply
+		this.getTypesToApply(function(types) {
 
-		Permission.getUserPermissions(user, this.modelName, function(rules) {
+			var i;
 
-			var tasks = [],
-			    i,
-			    j;
+			for (i = 0; i < types.length; i++) {
+				(function(type){
 
-			for (i = 0; i < rules.length; i++) {
-
-				for (j = 0; j < results.length; j++) {
-
-					(function(rule, item) {
-						tasks[tasks.length] = function(next_task) {
-
-							var type = Permission.getDataType(rule.type);
-
-							// If no valid type was found, continue to the next task
-							if (!type) {
-								return next_task();
-							}
-
-							// Prepare the type data
-							type.prepare({
-								rule: rule,
-								model: that.getModel(that.modelName),
-								item: item
-							}, function afterPrepare() {
-								tasker(next_task, type, item);
-							});
-
+					if (type.afterFind) {
+						tasks[tasks.length] = function (next_task) {
+							type.afterFind(results, primary, alias, next_task);
 						};
-					}(rules[i], results[j]));
-				}
+					}
+
+				}(types[i]));
 			}
+			
+			// Start executing all the types
+			async.parallel(tasks, function() {
 
-			async.series(tasks, function(err, f_results) {
+				var groups, acl, entry, item, i, j, allow;
 
-				// @todo: this should really be structured better,
-				// but right now it just needs to work
-				if (alias) {
-					var items = results,
-					    entry,
-					    item,
-					    _acl,
-					    i,
-					    j;
+				allow = true;
 
-					for (i = 0; i < items.length; i++) {
-						item = items[i];
+				// If the user is a superuser, do nothing
+				if (user.groups[String(alchemy.plugins.acl.SuperUserGroupId)]) {
+					return next();
+				}
 
-						item = item[alias];
+				groups = Model.get('AclRule').getUserGroups(user);
 
-						if (!Array.isArray(item)) {
-							item = [item];
+				for (i = 0; i < results.length; i++) {
+
+					item = results[i];
+					item = item[alias];
+
+					// Cast the item to an array
+					if (!Array.isArray(item)) {
+						item = [item];
+					}
+
+					for (j = 0; j < item.length; j++) {
+
+						entry = item[j];
+
+						if (!entry) {
+							continue;
 						}
 
-						for (j = 0; j < item.length; j++) {
-							entry = item[j];
+						// Get the ACL setting for this record
+						acl = entry._acl;
 
-							if (!entry) {
-								continue;
-							}
+						if (!acl && entry.settings) {
+							acl = entry.settings._acl;
+						}
 
-							_acl = entry._acl;
+						if (acl) {
 
-							if (!_acl && entry.settings) {
-								_acl = entry.settings._acl;
-							}
+							if (acl.read && acl.read.groups.length) {
+								allow = false;
 
-							if (_acl && _acl.allow_groups) {
-								if (!alchemy.areIn('or', _acl.allow_groups, user.groups)) {
-									
-									// Remove the item from the array, and detract the counter by 1
+								if (acl.read.groups.shared(groups, String).length) {
+									allow = true;
+								}
+
+								if (acl.read.users.shared([user._id], String).length) {
+									allow = true;
+								}
+
+								// If allow is false, remove the entry
+								if (!allow) {
 									item.splice(j, 1);
 									j--;
 
-									// If the original item wasn't an array, remove it there too
-									if (!Array.isArray(items[i][alias])) {
-										delete items[i][alias];
+									if (!Array.isArray(results[i][alias])) {
+										delete results[i][alias];
 									}
 								}
 							}
@@ -176,8 +203,46 @@ Behaviour.extend(function AclBehaviour (){
 
 				next();
 			});
-
 		});
 	};
 
+	/**
+	 * Launch the beforeSave methods of the rule types, if they are defined
+	 *
+	 * @author   Jelle De Loecker   <jelle@codedor.be>
+	 * @since    0.0.1
+	 * @version  0.0.1
+	 */
+	this.beforeSave = function beforeSave(next, record, options) {
+
+		var that  = this,
+		    tasks = [];
+
+		if (!this.render) {
+			return next();
+		}
+
+		// Get the augmented types to apply
+		this.getTypesToApply(function(types) {
+
+			var i;
+
+			for (i = 0; i < types.length; i++) {
+				(function(type){
+
+					if (type.beforeSave) {
+						tasks[tasks.length] = function (next_task) {
+							type.beforeSave(record, options, next_task);
+						};
+					}
+					
+				}(types[i]));
+			}
+			
+			// Start executing all the types
+			async.parallel(tasks, function() {
+				next();
+			});
+		});
+	};
 });

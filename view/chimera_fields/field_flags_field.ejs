@@ -1,0 +1,52 @@
+<%
+var fieldValue,
+    value,
+    path,
+    flag;
+
+if (item.value.value && typeof item.value.value == 'object') {
+	value = item.value.value;
+} else {
+	value = {};
+}
+
+start('wrapper');
+%>
+<div class="form-group">
+	<label for="<%= item.id %>" class="col-sm-2 control-label"><%= item.title %></label>
+	<div class="col-sm-10 controls">
+		<table class="table">
+			<tr>
+				<th><% echo(__('acl', 'Field Name')) %></th>
+					<% for (var flag in item.value.flags) { %>
+						<th><%= flag %></th>
+					<% } %>
+			</tr>
+			<% for (var key in item.value.fields) { %>
+				<%
+					fieldValue = value[key] || {};
+				%>
+				<tr>
+					<td><%= key %></td>
+					<% for (flag in item.value.flags) { %>
+						<%
+							path = item.fullPath + '[' + key + '][' + flag + ']';
+						%>
+						<td>
+							<input name="<%= path %>" value="0" type="hidden">
+							<input
+								name="<%= path %>"
+								class="form-control"
+								value="1"
+								type="checkbox"
+								<%= (fieldValue[flag] ? 'checked' : '') %>
+							>
+						</td>
+					<% } %>
+				</tr>
+
+			<% } %>
+		</table>
+	</div>
+</div>
+<% end('wrapper') %>

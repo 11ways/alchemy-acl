@@ -74,6 +74,13 @@ Model.extend(function AclGroupModel(){
 			root: {
 				type: 'Boolean',
 				default: false
+			},
+			special: {
+				type: 'Boolean',
+				default: false
+			},
+			special_command: {
+				type: 'String'
 			}
 		};
 
