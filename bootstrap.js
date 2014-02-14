@@ -1,6 +1,18 @@
 // Create an acl log function
 log.acl = log.verbose;
 
+// If the i18n translation function does not exist, create a dummy one
+if (!global.__) {
+	global.__ = function __(domain, name) {
+
+		if (typeof name == 'undefined') {
+			name = domain;
+		}
+
+		return name;
+	};
+}
+
 // Define the default options
 var options = {
 	// The model to use
