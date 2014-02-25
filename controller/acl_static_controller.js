@@ -53,8 +53,7 @@ Controller.extend(function AclStaticController (){
 				if (record.length) {
 
 					record = record[0];
-					pr(record, true)
-
+					
 					UserData = record[config.model];
 
 					// Delete the entry from the record
@@ -72,6 +71,7 @@ Controller.extend(function AclStaticController (){
 					}
 
 					bcrypt.compare(password, UserData.password, function(err, match) {
+
 						if (match) {
 							allow(render, UserData);
 						} else {
@@ -110,8 +110,12 @@ function allow(render, user) {
 	// If we still have nothing, go to the root
 	if (!redirectUrl) redirectUrl = '/';
 
+	// For the moment we can't store extra data, because when the object gets
+	// too big, it won't save the session
+	delete user.extra;
+
 	// Store the complete user data in the session
-	render.req.session.user = user;
+	render.req.session.user = alchemy.cloneSafe(user);
 
 	// Redirect to the correct url
 	render.redirect(redirectUrl);
