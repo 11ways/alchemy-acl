@@ -62,14 +62,6 @@ Controller.extend(function AclStaticController (){
 					// And store the rest back under the user
 					UserData.extra = record;
 
-					// Make sure there is a groups array
-					UserData.groups = {};
-
-					// Add the name of the group
-					for (i = 0; i < record.AclGroup.length; i++) {
-						UserData.groups[record.AclGroup[i]._id+''] = record.AclGroup[i].name;
-					}
-
 					bcrypt.compare(password, UserData.password, function(err, match) {
 
 						if (match) {
@@ -114,17 +106,24 @@ function allow(render, user) {
 	// too big, it won't save the session
 	delete user.extra;
 
-	// Store the complete user data in the session
-	render.req.session.user = alchemy.cloneSafe(user);
+	// Get all the ACL Groups this user belongs to or apply to him
+	Model.get('AclGroup').getUserGroups(user, function(err, groups){
 
-	// Redirect to the correct url
-	render.redirect(redirectUrl);
+		user.groups = groups;
 
-	// Remove the redirect directive
-	delete render.req.session.whenAuthRedirect;
+		// Store the complete user data in the session
+		render.req.session.user = alchemy.cloneSafe(user);
 
-	// Remove any authError messages
-	delete render.req.session.authError;
+		// Redirect to the correct url
+		render.redirect(redirectUrl);
+
+		// Remove the redirect directive
+		delete render.req.session.whenAuthRedirect;
+
+		// Remove any authError messages
+		delete render.req.session.authError;
+		
+	});
 }
 
 function deny(render) {
