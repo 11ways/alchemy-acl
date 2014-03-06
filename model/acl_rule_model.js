@@ -1,3 +1,5 @@
+var async = alchemy.use('async');
+
 /**
  * ACL Rules Model
  *
@@ -184,8 +186,7 @@ Model.extend(function AclRuleModel() {
 		    type;
 
 		if (!this.render) {
-			log.error('Tried to get the ACL Model fields without render object');
-			return callback();
+			return callback(alchemy.createError('Tried to get the ACL Model fields without render object'));
 		}
 
 		if (typeof model == 'object' && model.modelName) {
@@ -204,8 +205,35 @@ Model.extend(function AclRuleModel() {
 		type = type.augment({model: model, render: that.render});
 
 		type.getFieldFlags(true, function(fields) {
-			callback(fields);
+			callback(null, fields);
 		});
+	};
+
+	/**
+	 * Get all the fields for this model and its associations
+	 *
+	 * @author   Jelle De Loecker   <jelle@codedor.be>
+	 * @since    0.0.1
+	 * @version  0.0.1
+	 *
+	 * @param    {Object}   model
+	 */
+	this.getAllFields = function getAllFields(model, callback) {
+
+		// Find out which models we need to get
+		var that      = this,
+		    tasks     = {},
+		    aliasMap  = model.getAssociationsMap(),
+		    alias;
+
+		// Get the model field flags for every alias
+		Object.each(aliasMap, function(modelName, alias) {
+			tasks[alias] = function(next) {
+				that.getModelFields(modelName, next);
+			};
+		});
+
+		async.parallel(tasks, callback);
 	};
 
 });
