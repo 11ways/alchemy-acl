@@ -223,7 +223,7 @@ Model.extend(function AclRuleModel() {
 		// Find out which models we need to get
 		var that      = this,
 		    tasks     = {},
-		    aliasMap  = model.getAssociationsMap(),
+		    aliasMap  = Model.getAssociationsMap(model),
 		    alias;
 
 		// Get the model field flags for every alias
