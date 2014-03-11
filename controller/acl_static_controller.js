@@ -57,7 +57,7 @@ Controller.extend(function AclStaticController (){
 					UserData = record[config.model];
 
 					// Delete the entry from the record
-					//delete record[config.model];
+					delete record[config.model];
 
 					// And store the rest back under the user
 					UserData.extra = record;
