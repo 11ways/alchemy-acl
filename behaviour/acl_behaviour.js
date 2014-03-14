@@ -100,6 +100,108 @@ Behaviour.extend(function AclBehaviour (){
 	};
 
 	/**
+	 * Launch the beforeRemove methods of the rule types, if they are defined
+	 *
+	 * @author   Jelle De Loecker   <jelle@codedor.be>
+	 * @since    0.0.1
+	 * @version  0.0.1
+	 */
+	this.beforeRemove = function beforeRemove(next, data) {
+
+		var that  = this,
+		    tasks = [],
+		    user;
+
+		if (!this.render) {
+			return next();
+		}
+
+		user = that.render.req.session.user;
+
+		// If the user is a superuser, do nothing
+		if (user && user.groups[String(alchemy.plugins.acl.SuperUserGroupId)]) {
+			return next();
+		}
+
+		// Get the augmented types to apply
+		this.getTypesToApply(function(types) {
+
+			types.forEach(function(type) {
+				if (type.beforeRemove) {
+					tasks[tasks.length] = function (next_task) {
+						type.beforeRemove(data, function(response) {
+
+							// If the beforeFind returns an explicit false,
+							// ignore the other types and do nothing
+							if (response === false) {
+								next(false);
+							} else {
+								next_task();
+							}
+						});
+					};
+				}
+			});
+			
+			// Start executing all the types
+			async.parallel(tasks, function() {
+				next();
+			});
+		});
+	};
+
+	/**
+	 * Launch the beforeFind methods of the rule types, if they are defined
+	 *
+	 * @author   Jelle De Loecker   <jelle@codedor.be>
+	 * @since    0.0.1
+	 * @version  0.0.1
+	 */
+	this.beforeFind = function beforeFind(next, options) {
+
+		var that  = this,
+		    tasks = [],
+		    user;
+
+		if (!this.render) {
+			return next();
+		}
+
+		user = that.render.req.session.user;
+
+		// If the user is a superuser, do nothing
+		if (user && user.groups[String(alchemy.plugins.acl.SuperUserGroupId)]) {
+			return next();
+		}
+
+		// Get the augmented types to apply
+		this.getTypesToApply(function(types) {
+
+			types.forEach(function(type) {
+				if (type.beforeFind) {
+					tasks[tasks.length] = function (next_task) {
+						type.beforeFind(options, function(response) {
+
+							// If the beforeFind returns an explicit false,
+							// ignore the other types and do nothing
+							if (response === false) {
+								next(false);
+							} else {
+								next_task();
+							}
+						});
+					};
+				}
+			});
+			
+			// Start executing all the types
+			async.parallel(tasks, function() {
+				next();
+			});
+		});
+	};
+
+	/**
 	 * Launch the afterFind methods of the rule types, if they are defined
 	 *
 	 * @author   Jelle De Loecker   <jelle@codedor.be>
@@ -217,9 +319,17 @@ Behaviour.extend(function AclBehaviour (){
 
 		var that  = this,
 		    tasks = [],
-		    getOriginal = {};
+		    getOriginal = {},
+		    user;
 
 		if (!this.render) {
+			return next();
+		}
+
+		user = that.render.req.session.user;
+
+		// If the user is a superuser, do nothing
+		if (user && user.groups[String(alchemy.plugins.acl.SuperUserGroupId)]) {
 			return next();
 		}
 
@@ -257,18 +367,21 @@ Behaviour.extend(function AclBehaviour (){
 
 				var i;
 
-				for (i = 0; i < types.length; i++) {
-					(function(type){
+				types.forEach(function forEachType(type) {
+					if (type.beforeSave) {
+						tasks[tasks.length] = function (next_task) {
+							type.beforeSave(original, record, options, function(err) {
 
-						if (type.beforeSave) {
-							tasks[tasks.length] = function (next_task) {
-								type.beforeSave(original, record, options, next_task);
-							};
-						}
-						
-					}(types[i]));
-				}
-				
+								if (err) {
+									return next(err);
+								}
+
+								next_task();
+							});
+						};
+					}
+				});
+
 				// Start executing all the types
 				async.parallel(tasks, function() {
 					next();
