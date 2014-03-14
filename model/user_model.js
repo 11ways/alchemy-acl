@@ -26,6 +26,13 @@ Model.extend(function UserModel() {
 		this.parent();
 
 		this.displayField = 'username';
+		
+		this.hasOneChild = {
+			NotificationSetting: {
+				modelName: 'NotificationSetting',
+				foreignKey: 'user_id'
+			}
+		};
 
 		this.hasAndBelongsToMany = {
 			AclGroup: {
