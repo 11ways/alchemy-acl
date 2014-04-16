@@ -204,8 +204,12 @@ Model.extend(function AclRuleModel() {
 		type = this.types['model'];
 		type = type.augment({model: model, render: that.render});
 
-		type.getFieldFlags(true, function(fields) {
-			callback(null, fields);
+		type.getFieldFlags(true, function(err, fields, modelFlags) {
+
+			var fieldFlags = alchemy.inject({}, fields);
+			fieldFlags.__modelFlags = modelFlags;
+
+			callback(null, fieldFlags);
 		});
 	};
 
