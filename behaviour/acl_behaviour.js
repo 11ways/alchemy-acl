@@ -1,4 +1,6 @@
-var async = alchemy.use('async');
+var expirable = alchemy.use('expirable'),
+    async     = alchemy.use('async'),
+    cache     = new expirable('15 minutes');
 
 /**
  * The ACL Behaviour class
@@ -25,7 +27,6 @@ Behaviour.extend(function AclBehaviour (){
 
 		// Call the parent preInit function
 		this.parent('preInit');
-
 	};
 
 	/**
@@ -58,43 +59,82 @@ Behaviour.extend(function AclBehaviour (){
 	 *
 	 * @author   Jelle De Loecker   <jelle@codedor.be>
 	 * @since    0.0.1
-	 * @version  0.0.1
+	 * @version  0.1.0
 	 */
 	this.getTypesToApply = function getTypesToApply(callback) {
 
-		var AclRule   = Model.get('AclRule'),
-		    ruleTypes = AclRule.getTypesByDomain('behaviour'),
-		    tasks     = [],
-		    that      = this,
-		    useTypes  = [],
+		var ruleTypes,
+		    useTypes,
+		    cacheId,
+		    doCache,
+		    aclRule,
+		    result,
+		    tasks,
+		    that,
 		    i;
 
-		for (i = 0; i < ruleTypes.length; i++) {
+		that = this;
+		tasks = [];
+		cacheId = 'tta-' + this.modelName + '-';
 
-			(function(type) {
+		if (this.render.req.session.user && this.render.req.session.user._id) {
+			cacheId += this.render.req.session.user._id;
+		} else {
+			cacheId += 'undefined_user';
+		}
 
-				tasks[tasks.length] = function(next_task) {
+		// Get the types from the cache
+		result = cache.get(cacheId, true);
 
-					// Make sure the type has the method to check if it applies
-					if (!type.doesTypeApply) {
-						return next_task();
-					}
+		if (!result) {
 
-					type.doesTypeApply(that.model, function(apply) {
+			// Get the required model
+			AclRule   = Model.get('AclRule');
+			ruleTypes = AclRule.getTypesByDomain('behaviour');
 
-						// If apply is true, add it to the array of types to use
-						if (apply) {
-							useTypes.push(type.augment({model: that.model, render: that.render}));
+			// Tell it to store it in cache later
+			doCache = true;
+			
+			result = [];
+
+			for (i = 0; i < ruleTypes.length; i++) {
+
+				(function(type) {
+
+					tasks[tasks.length] = function(next_task) {
+
+						// Make sure the type has the method to check if it applies
+						if (!type.doesTypeApply) {
+							return next_task();
 						}
 
-						next_task();
-					});
-				};
+						type.doesTypeApply(that.model, function(apply) {
 
-			}(ruleTypes[i]));
+							// If apply is true, add it to the array of types to use
+							if (apply) {
+								result.push(type);
+							}
+
+							next_task();
+						});
+					};
+
+				}(ruleTypes[i]));
+			}
 		}
 
 		async.parallel(tasks, function() {
+
+			if (doCache) {
+				cache.set(cacheId, result);
+			}
+
+			useTypes = [];
+
+			for (i = 0; i < result.length; i++) {
+				useTypes.push(result[i].augment({model: that.model, render: that.render}));
+			}
+
 			callback(useTypes);
 		});
 	};

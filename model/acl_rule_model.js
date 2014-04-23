@@ -145,7 +145,7 @@ Model.extend(function AclRuleModel() {
 			'target_users': users
 		};
 
-		this.find('all', function(err, items) {
+		this.find('all', {recursive: 0}, function(err, items) {
 
 			var sharedGroup,
 			    sharedUser,
