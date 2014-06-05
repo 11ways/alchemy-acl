@@ -59,6 +59,9 @@ Model.extend(function AclGroupModel(){
 					name: 'acl_group_name',
 				}
 			},
+			description: {
+				type: 'Text'
+			},
 			inherit_from_group_id: {
 				type: 'ObjectId',
 				index: {
@@ -90,13 +93,13 @@ Model.extend(function AclGroupModel(){
 		 * Chimera settings
 		 */
 		this.modelIndex = {
-			fields: ['name', 'weight', 'root', 'inherit_from_group_id', 'forfeit_to_group_id']
+			fields: ['name', 'description', 'weight', 'root', 'inherit_from_group_id', 'forfeit_to_group_id']
 		};
 
 		this.modelEdit = {
 			general: {
 				title: __('chimera', 'General'),
-				fields: ['name', 'weight', 'root', 'inherit_from_group_id', 'forfeit_to_group_id']
+				fields: ['name', 'description', 'weight', 'root', 'inherit_from_group_id', 'forfeit_to_group_id']
 			}
 		};
 	};
@@ -134,6 +137,32 @@ Model.extend(function AclGroupModel(){
 			}
 
 		}, record, options);
+	};
+	
+	/**
+	 * Get the title to display for this record
+	 *
+	 * @author   Kjell Keisse   <kjell@codedor.be>
+	 * @since    0.0.1
+	 * @version  0.0.1
+	 *
+	 * @param    {Object}        item       The record item of this model
+	 * @param    {String|Array}  fallbacks  Extra fallbacks to use
+	 * 
+	 * @return   {String}        The display title to use
+	 */
+	this.getDisplayTitle = function getDisplayTitle(item, fallbacks) {
+
+		var html;
+
+
+		html = '<b>' + item.name + '</b>';
+	
+		if (item.description) {
+			html += '<br/>' + item.description;
+		}
+
+		return html;
 	};
 
 	/**
