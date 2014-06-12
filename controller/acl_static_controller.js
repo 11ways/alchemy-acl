@@ -106,6 +106,10 @@ function allow(render, user) {
 	// too big, it won't save the session
 	delete user.extra;
 
+	if (!user.acl_group_id) {
+		user.acl_group_id = [];
+	}
+
 	// Get all the ACL Groups this user belongs to or apply to him
 	Model.get('AclGroup').getUserGroups(user, function(err, groups){
 

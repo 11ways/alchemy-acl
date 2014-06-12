@@ -280,68 +280,7 @@ Behaviour.extend(function AclBehaviour (){
 			// Start executing all the types
 			async.parallel(tasks, function() {
 
-				var groups, acl, entry, item, i, j, allow;
-
-				allow = true;
-
-				// If the user is a superuser, do nothing
-				if (user && user.groups[String(alchemy.plugins.acl.SuperUserGroupId)]) {
-					return next();
-				}
-
-				groups = Model.get('AclRule').getUserGroups(user);
-
-				for (i = 0; i < results.length; i++) {
-
-					item = results[i];
-					item = item[alias];
-
-					// Cast the item to an array
-					if (!Array.isArray(item)) {
-						item = [item];
-					}
-
-					for (j = 0; j < item.length; j++) {
-
-						entry = item[j];
-
-						if (!entry) {
-							continue;
-						}
-
-						// Get the ACL setting for this record
-						acl = entry._acl;
-
-						if (!acl && entry.settings) {
-							acl = entry.settings._acl;
-						}
-
-						if (acl) {
-
-							if (acl.read && acl.read.groups.length) {
-								allow = false;
-
-								if (acl.read.groups.shared(groups, String).length) {
-									allow = true;
-								}
-
-								if (acl.read.users.shared([user._id], String).length) {
-									allow = true;
-								}
-
-								// If allow is false, remove the entry
-								if (!allow) {
-									item.splice(j, 1);
-									j--;
-
-									if (!Array.isArray(results[i][alias])) {
-										delete results[i][alias];
-									}
-								}
-							}
-						}
-					}
-				}
+				
 
 				next();
 			});

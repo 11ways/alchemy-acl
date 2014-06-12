@@ -3,6 +3,7 @@ var fieldValue,
     groupValue,
     userValue,
     value,
+    flags,
     path,
     flag;
 
@@ -10,6 +11,12 @@ if (item.value.value && typeof item.value.value == 'object') {
 	value = item.value.value;
 } else {
 	value = {};
+}
+
+if (item.flags) {
+	flags = Object.objectify(item.flags);
+} else {
+	flags = item.value.flags;
 }
 
 start('wrapper');
@@ -23,7 +30,7 @@ start('wrapper');
 				<th><% echo(__('acl', 'Acl Group')) %></th>
 				<th><% echo(__('acl', 'Acl User')) %></th>
 			</tr>
-			<% for (var flag in item.value.flags) { %>
+			<% for (var flag in flags) { %>
 				<%
 					fieldValue = value[flag] || {};
 					groupValue = fieldValue.groups || [];
@@ -34,7 +41,7 @@ start('wrapper');
 						<%
 							path = item.fullPath + '[' + flag + ']';
 						%>
-						<td>
+						<td style="min-width:500px">
 							<input
 								type="hidden"
 								name="<%= path + '[groups]' %>"
