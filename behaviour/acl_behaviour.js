@@ -195,7 +195,7 @@ Behaviour.extend(function AclBehaviour (){
 	 *
 	 * @author   Jelle De Loecker   <jelle@codedor.be>
 	 * @since    0.0.1
-	 * @version  0.0.1
+	 * @version  0.1.0
 	 */
 	this.beforeFind = function beforeFind(next, options) {
 
@@ -213,6 +213,8 @@ Behaviour.extend(function AclBehaviour (){
 		if (user && user.groups[String(alchemy.plugins.acl.SuperUserGroupId)]) {
 			return next();
 		}
+
+		this.beforeFindInItem(options);
 
 		// Get the augmented types to apply
 		this.getTypesToApply(function(types) {
@@ -239,6 +241,77 @@ Behaviour.extend(function AclBehaviour (){
 				next();
 			});
 		});
+	};
+
+	/**
+	 * Add in-item acl conditions
+	 *
+	 * @author   Jelle De Loecker   <jelle@codedor.be>
+	 * @since    0.1.0
+	 * @version  0.1.0
+	 */
+	this.beforeFindInItem = function beforeFindInItem(options) {
+
+		var inItemPath,
+		    groups = [],
+		    user = this.render.req.session.user,
+		    $or = [],
+		    key,
+		    obj,
+		    i;
+
+		if (this.model.inItemAclPath) {
+			inItemPath = this.model.inItemAclPath;
+		} else {
+			inItemPath = '_acl';
+		}
+
+		obj = {};
+		obj[inItemPath] = {$exists: false};
+
+		// Include items without any _acl settings
+		$or.push(obj);
+
+		obj = {};
+		obj[inItemPath + '.read.groups'] = {$size: 0};
+		obj[inItemPath + '.read.users'] = {$size: 0};
+
+		// Or items where the _acl settings are empty
+		$or.push(obj);
+
+		obj = {};
+		obj[inItemPath + '.read.users'] = {$in: [alchemy.castObjectId(user._id)]};
+
+		// Or items where this user is allowed
+		$or.push(obj);
+
+		// Or items where one of this user's group is allowed
+		for (i = 0; i < user.acl_group_id.length; i++) {
+			groups.push(alchemy.castObjectId(user.acl_group_id[i]));
+		}
+
+		obj = {};
+		obj[inItemPath + '.read.groups'] = {$in: groups};
+
+		$or.push(obj);
+
+		if (!options.conditions.$or) {
+			options.conditions.$or = $or;
+		} else {
+
+			if (Array.isArray(options.conditions.$or)) {
+				options.conditions.$or = options.conditions.$or.concat($or);
+			} else {
+
+				for (key in options.conditions.$or) {
+					obj = {};
+					obj[key] = options.conditions.$or[key];
+					$or.push(obj);
+				}
+
+				options.conditions.$or = $or;
+			}
+		}
 	};
 
 	/**
