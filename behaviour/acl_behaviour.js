@@ -279,21 +279,23 @@ Behaviour.extend(function AclBehaviour (){
 		// Or items where the _acl settings are empty
 		$or.push(obj);
 
-		obj = {};
-		obj[inItemPath + '.read.users'] = {$in: [alchemy.castObjectId(user._id)]};
+		if (user && user._id) {
+			obj = {};
+			obj[inItemPath + '.read.users'] = {$in: [alchemy.castObjectId(user._id)]};
 
-		// Or items where this user is allowed
-		$or.push(obj);
+			// Or items where this user is allowed
+			$or.push(obj);
 
-		// Or items where one of this user's group is allowed
-		for (i = 0; i < user.acl_group_id.length; i++) {
-			groups.push(alchemy.castObjectId(user.acl_group_id[i]));
+			// Or items where one of this user's group is allowed
+			for (i = 0; i < user.acl_group_id.length; i++) {
+				groups.push(alchemy.castObjectId(user.acl_group_id[i]));
+			}
+
+			obj = {};
+			obj[inItemPath + '.read.groups'] = {$in: groups};
+
+			$or.push(obj);
 		}
-
-		obj = {};
-		obj[inItemPath + '.read.groups'] = {$in: groups};
-
-		$or.push(obj);
 
 		if (!options.conditions.$or) {
 			options.conditions.$or = $or;
