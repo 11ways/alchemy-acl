@@ -256,6 +256,7 @@ Behaviour.extend(function AclBehaviour (){
 		    groups = [],
 		    user = this.render.req.session.user,
 		    $or = [],
+		    $and,
 		    key,
 		    obj,
 		    i;
@@ -297,21 +298,27 @@ Behaviour.extend(function AclBehaviour (){
 			$or.push(obj);
 		}
 
-		if (!options.conditions.$or) {
-			options.conditions.$or = $or;
+		if (!options.conditions.$and) {
+			options.conditions.$and = {};
+		}
+
+		$and = options.conditions.$and;
+
+		if (!$and.$or) {
+			$and.$or = $or;
 		} else {
 
-			if (Array.isArray(options.conditions.$or)) {
-				options.conditions.$or = options.conditions.$or.concat($or);
+			if (Array.isArray($and.$or)) {
+				$and.$or = $and.$or.concat($or);
 			} else {
 
-				for (key in options.conditions.$or) {
+				for (key in $and.$or) {
 					obj = {};
 					obj[key] = options.conditions.$or[key];
 					$or.push(obj);
 				}
 
-				options.conditions.$or = $or;
+				$and.$or = $or;
 			}
 		}
 	};
