@@ -185,7 +185,14 @@ Model.extend(function AclGroupModel(){
 
 				that.find('first', {fields: ['name'], conditions: {'_id': groupId}}, function(err, group) {
 
-					var result = {};
+					var result;
+
+					// @todo: non-existant groups should be removed
+					if (!group.length) {
+						return next();
+					}
+
+					result = {};
 
 					if (err) {
 						return next(err);
@@ -222,6 +229,11 @@ Model.extend(function AclGroupModel(){
 			}
 
 			for (key in result) {
+
+				if (!result[key]) {
+					continue;
+				}
+
 				for (id in result[key]) {
 					groups[id] = result[key][id];
 				}
