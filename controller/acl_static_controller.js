@@ -56,6 +56,13 @@ Controller.extend(function AclStaticController (){
 					
 					UserData = record[config.model];
 
+					// @todo: should be moved to regular user settings
+					if (record.NotificationSetting && record.NotificationSetting.prefix_preference) {
+						UserData.prefix_preference = record.NotificationSetting.prefix_preference;
+					} else {
+						UserData.prefix_preference = '';
+					}
+
 					// Delete the entry from the record
 					delete record[config.model];
 
