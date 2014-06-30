@@ -157,7 +157,9 @@ alchemy.on('render.callback', function(render, callback) {
 			user.fullname = user.first_name + ' ' + user.last_name;
 		}
 		display = user.fullname || user.name || user.username || user.email;
-		render.viewVars.name = display;
+		render.viewVars.UserFullName = display;
+		render.viewVars.UserFirstName = user.first_name || user.username || '';
+		render.viewVars.UserLastName = user.last_name || '';
 	}
 	
 	callback();
