@@ -259,6 +259,7 @@ Behaviour.extend(function AclBehaviour (){
 		    $and,
 		    key,
 		    obj,
+		    gid,
 		    i;
 
 		if (this.model.inItemAclPath) {
@@ -268,7 +269,7 @@ Behaviour.extend(function AclBehaviour (){
 		}
 
 		obj = {};
-		obj[inItemPath] = {$exists: false};
+		obj[inItemPath] = null; // Is null or does not exist, better than {$exists: false};
 
 		// Include items without any _acl settings
 		$or.push(obj);
@@ -289,7 +290,9 @@ Behaviour.extend(function AclBehaviour (){
 
 			// Or items where one of this user's group is allowed
 			for (i = 0; i < user.acl_group_id.length; i++) {
-				groups.push(alchemy.castObjectId(user.acl_group_id[i]));
+				gid = alchemy.castObjectId(user.acl_group_id[i]);
+				groups.push(gid);
+				groups.push(''+gid);
 			}
 
 			obj = {};
