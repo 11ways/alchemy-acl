@@ -66,5 +66,36 @@ Model.extend(function UserModel() {
 				}
 			}
 		};
+
+		this.modelEdit = {
+			general: {
+				title: __('chimera', 'General'),
+				fields: [
+					'username',
+					'name',
+					'password',
+					'acl_group_id'
+				]
+			}
+		};
+
+		this.modelIndex = {
+			fields: [
+				'created',
+				'username',
+				'name',
+				'acl_group_id'
+			]
+		};
+
+		this.actionLists = {
+			paginate: ['index', 'add'],
+			list: ['export'],
+			record: [
+				'view',
+				'edit',
+				'remove'
+			]
+		};
 	};
 });
