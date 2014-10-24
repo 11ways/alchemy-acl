@@ -144,7 +144,7 @@ Model.extend(function AclGroupModel(){
 	 *
 	 * @author   Kjell Keisse   <kjell@codedor.be>
 	 * @since    0.0.1
-	 * @version  0.0.1
+	 * @version  0.1.0
 	 *
 	 * @param    {Object}        item       The record item of this model
 	 * @param    {String|Array}  fallbacks  Extra fallbacks to use
@@ -153,11 +153,16 @@ Model.extend(function AclGroupModel(){
 	 */
 	this.getDisplayTitle = function getDisplayTitle(item, fallbacks) {
 
-		var html;
+		var html,
+		    item;
+
+		if (item['AclGroup']) {
+			item = item['AclGroup'];
+		}
 
 
 		html = '<b>' + item.name + '</b>';
-	
+
 		if (item.description) {
 			html += '<br/>' + item.description;
 		}
