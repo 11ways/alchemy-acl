@@ -65,7 +65,9 @@ var options = {
 };
 
 // Inject the user-overridden options
-alchemy.plugins.acl = alchemy.inject(options, alchemy.plugins.acl);
+alchemy.plugins.acl = Object.assign(options, alchemy.plugins.acl);
+
+return;
 
 // Make sure the model name is correct
 options.model = options.model.modelName();

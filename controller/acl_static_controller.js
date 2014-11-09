@@ -1,148 +1,243 @@
 var bcrypt = alchemy.use('bcrypt'),
-    config = alchemy.plugins.acl;
+    AclPlugin = alchemy.plugins.acl,
+    Conduit = alchemy.classes.Conduit;
 
 /**
  * The ACL Static Controller
  *
  * @constructor
- * @extends       alchemy.classes.AppController
+ * @extends  alchemy.classes.AppController
  *
- * @author        Jelle De Loecker   <jelle@kipdola.be>
- * @since         0.0.1
- * @version       0.0.1
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.0.1
+ * @version  1.0.0
  */
-Controller.extend(function AclStaticController (){
-	
-	this.useModel = false;
-
-	/**
-	 * Render the login form (GET-only)
-	 */
-	this.loginForm = function loginForm(render) {
-		render('acl/login', {authError: render.req.session.authError||false});
-		
-		// Remove any authError messages
-		delete render.req.session.authError;
-	};
-
-	/**
-	 * Log in the user (POST-only)
-	 */
-	this.loginUser =  function loginUser(render) {
-
-		var data = render.req.body.data,
-		    username,
-		    password,
-		    conditions = {};
-
-		if (data && data.Login) {
-			username = data.Login.username;
-			password = data.Login.password;
-		}
-
-		if (username && password) {
-
-			// Add a condition for the username field
-			conditions[config.username] = username;
-
-			Model.get(config.model).find('first', {conditions: conditions}, function(err, record) {
-
-				var UserData,
-				    i;
-
-				if (record.length) {
-
-					record = record[0];
-					
-					UserData = record[config.model];
-
-					// @todo: should be moved to regular user settings
-					if (record.NotificationSetting && record.NotificationSetting.prefix_preference) {
-						UserData.prefix_preference = record.NotificationSetting.prefix_preference;
-					} else {
-						UserData.prefix_preference = '';
-					}
-
-					// Delete the entry from the record
-					delete record[config.model];
-
-					// And store the rest back under the user
-					UserData.extra = record;
-
-					bcrypt.compare(password, UserData.password, function(err, match) {
-
-						if (match) {
-							allow(render, UserData);
-						} else {
-							deny(render);
-						}
-					});
-				} else {
-					deny(render);
-				}
-			});
-		} else {
-			deny(render);
-		}
-
-	};
-
-	/**
-	 * This logged in user is not authorized to see this
-	 */
-	this.unauthorized = function unauthorized(render) {
-		render('acl/unauthorized');
-	};
-	
-	this.logout = function logout(render){
-		delete render.req.session.user;
-		render.redirect('/');
-	};
-
+var AclStatic = Function.inherits('AppController', function AclStaticController(conduit, options) {
+	AclStaticController.super.call(this, conduit, options);
 });
 
-function allow(render, user) {
+/**
+ * Render the login form (GET-only)
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.0.1
+ * @version  1.0.0
+ */
+AclStatic.setMethod(function loginForm(conduit) {
+	this.render('acl/login');
+});
 
-	// Make sure we have a valid url to redirect to
-	var redirectUrl = render.req.session.whenAuthRedirect || alchemy.plugins.acl.redirect;
+/**
+ * Log in the user (POST-only)
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.0.1
+ * @version  1.0.0
+ */
+AclStatic.setMethod(function loginPost(conduit) {
 
-	// If we still have nothing, go to the root
-	if (!redirectUrl) redirectUrl = '/';
+	var that = this,
+	    conditions,
+	    username,
+	    password;
 
-	// For the moment we can't store extra data, because when the object gets
-	// too big, it won't save the session
-	delete user.extra;
+	username = conduit.body.username;
+	password = conduit.body.password;
 
-	if (!user.acl_group_id) {
-		user.acl_group_id = [];
+	pr(conduit.body, true);
+
+	if (!username || !password) {
+		pr('Body not set?');
+		return this.notAuthorized();
 	}
 
-	// Get all the ACL Groups this user belongs to or apply to him
-	Model.get('AclGroup').getUserGroups(user, function(err, groups){
+	Model.get('User').find('first', {conditions: {username: username}}, function gotUser(err, items) {
 
-		user.groups = groups;
+		var record;
 
-		// Store the complete user data in the session
-		render.req.session.user = alchemy.cloneSafe(user);
+		if (err != null) {
+			return that.error(err);
+		}
 
-		// Redirect to the correct url
-		render.redirect(redirectUrl);
+		record = items[0];
 
-		// Remove the redirect directive
-		delete render.req.session.whenAuthRedirect;
+		if (!record) {
+			return conduit.notAuthorized(true);
+		} else {
+			record = record.User;
+		}
 
-		// Remove any authError messages
-		delete render.req.session.authError;
-		
+		bcrypt.compare(password, record.password, function compared(err, match) {
+
+			if (err != null) {
+				return that.error(err);
+			}
+
+			if (match) {
+				that.allow(record);
+			} else {
+				conduit.notAuthorized(true);
+			}
+		});
 	});
-}
+});
 
-function deny(render) {
+/**
+ * Log the user out
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.0.1
+ * @version  1.0.0
+ */
+AclStatic.setMethod(function logout() {
 
-	pr('Access denied!'.red.bold);
+	// Remove the user data from the session
+	this.session('afterLogin', null);
+	this.session('UserData', null);
 
-	render.req.session.authError = 'Username/Password are not correct';
+	// Redirect to the root
+	this.conduit.redirect('/');
+});
 
-	// Try logging in again
-	render.redirect('/login');
-}
+/**
+ * The user has succesfully authenticated
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.0.1
+ * @version  1.0.0
+ *
+ * @param    {Object}   UserData
+ */
+AclStatic.setMethod(function allow(UserData) {
+
+	var afterLogin = this.session('afterLogin');
+
+	// Remove the session
+	this.session('afterLogin', null);
+
+	if (!afterLogin || !afterLogin.url) {
+		afterLogin = {url: '/'};
+	}
+
+	// Store the userdata in the session
+	this.session('UserData', UserData);
+
+	this.conduit.redirect(afterLogin);
+});
+
+/**
+ * The current user is not authorized and needs to log in
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    1.0.0
+ * @version  1.0.0
+ *
+ * @param    {Boolean}   triedAuth   Indicate that this was an auth attempt
+ */
+Conduit.setMethod(function notAuthorized(triedAuth) {
+
+	var afterLogin
+
+	if (triedAuth) {
+		this.set('authError', 'Username/Password are not correct');
+	} else {
+		// Store the request
+		afterLogin = {
+			url: this.url,
+			body: this.body,
+			method: this.method,
+			headers: this.headers
+		};
+
+		this.session('afterLogin', afterLogin);
+	}
+
+	this.setHeader('x-fallback-url', '/login');
+
+	this.status = 401;
+	this.render('acl/login');
+});
+
+/**
+ * The current user is authenticated, but not allowed
+ *
+ * @author        Jelle De Loecker   <jelle@kipdola.be>
+ * @since         1.0.0
+ * @version       1.0.0
+ */
+Conduit.setMethod(function forbidden() {
+
+	var user = this.session('UserData');
+
+	if (user) {
+		this.deny(403, 'Forbidden');
+	} else {
+		this.notAuthorized();
+	}
+});
+
+Router.use(function checkUrl(req, res, next) {
+
+	var options,
+	    groups,
+	    users,
+	    user,
+	    path;
+	
+	path = req.conduit.url.pathname;
+	user = req.conduit.session('UserData');
+	groups = [AclPlugin.EveryoneGroupId];
+
+	if (user) {
+		groups.push(AclPlugin.LoggedInGroupId);
+		groups = groups.concat(user.acl_group_id);
+		users = [user._id];
+	} else {
+		user = {};
+		users = [];
+	}
+
+	options = {
+		conditions: {
+			'settings.url': {$type: 11}
+		},
+		recursive: 0,
+		sort: {'settings.order': 'DESC'}
+	};
+
+	Model.get('AclRule').find('all', options, function gotRules(err, rules) {
+
+		var allowed = true,
+		    sharedGroup,
+		    sharedUser,
+		    rule,
+		    i;
+
+		for (i = 0; i < rules.length; i++) {
+			rule = rules[i].AclRule;
+
+			// See if this rule applies to this url
+			if (rule.settings.url.test(path)) {
+
+				// See if this rule applies to our user
+				sharedGroup = groups.shared(rule.target_groups_id, String);
+				sharedUser = users.shared(rule.target_users_id, String);
+
+				// If this rule matches a group or the user, use it
+				if (sharedGroup.length || sharedUser.length) {
+					allowed = rule.settings.allow;
+
+					if (rule.settings.halt) {
+						break;
+					}
+				}
+			}
+		}
+
+		if (!allowed) {
+			req.conduit.forbidden();
+		} else {
+			next();
+		}
+	});
+}, {weight: 9000});
