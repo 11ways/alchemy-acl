@@ -1,8 +1,30 @@
-<% if (authError) { %>
-<p><%= authError %></p>
-<% } %>
-<form action="/login" method="POST">
-<input type="text" name="username">
-<input type="password" name="password">
-<input type="submit">
-</form>
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<% this.foundation() %>
+		<% style('chimera/chimera') %>
+		<% style('login') %>
+		<script>
+			var Blast = __Protoblast;
+			Blast.__init(true);
+		</script>
+	</head>
+	<body>
+		<% if (authError) { %>
+			<p><%= authError %></p>
+		<% } %>
+		<div class="form-container">
+			<img src="/public/logo.png" class="logo" alt="Rooffood" />
+			<form action="/login" method="POST">
+				<div class="user">
+					<input type="text" name="username" placeholder="login">
+				</div>
+				<div class="password">
+					<input type="password" name="password" placeholder="password">
+				</div>
+				<input type="submit" class="btn-top" value="Login">
+			</form>
+		</div>
+	</body>
+</html>

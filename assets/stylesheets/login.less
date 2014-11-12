@@ -1,0 +1,110 @@
+@import url(http://fonts.googleapis.com/css?family=Lato);
+
+@gray-light: rgb(245, 245, 245);
+@gray: rgb(174, 174, 174);
+
+@lato:      'Lato', sans-serif;
+html{
+	font-size: 62.5%;
+}
+body{
+	background-image: url('/public/background_chimera.png');
+	background-image: url('/public/background_chimera.svg');
+	background-position: right bottom;
+	background-repeat: no-repeat;
+	background-size: 30rem 30rem;
+}
+form{
+	padding: 45px;
+	background: @gray-light;
+	width: 377px;
+	position: relative;
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	&:before{
+		position: absolute;
+		top:-20px;
+		left: 50%;
+		width: 0px;
+		height: 0px;
+		border-bottom: 20px solid @gray-light;
+		border-left: 20px solid transparent;
+		border-right: 20px solid transparent;
+		content: "Rooffood";
+		text-indent: -9999px;
+		color: transparent;
+		margin-left: -20px;
+	}
+	input{
+		display: block;
+		width: 100%;
+		height: 50px;
+		margin-bottom: 10px;
+		padding: 0px 20px 0px 50px;
+		border: none;
+		-webkit-font-smoothing: antialiased;
+		font-family: @lato;
+		color: @gray;
+		font-size: 18px;
+		font-size: 1.8rem;
+	}
+	div{
+		&.user,
+		&.password{
+			&:before{
+				display: block;
+				content: "Rooffood";
+				text-indent: -9999px;
+				color: transparent;
+				position: absolute;
+				z-index: 11;
+			}
+		}
+		&.user{
+			&:before{
+				width: 25px;
+				height: 27px;
+				background: url('/public/user_icon.png') no-repeat;
+				background: url('/public/user_icon.svg') no-repeat;
+				margin-top: 12px;
+				margin-left: 12px;
+			}
+		}
+		&.password{
+			&:before{
+				width: 25px;
+				height: 13px;
+				background: url('/public/key_icon.png') no-repeat;
+				background: url('/public/key_icon.svg') no-repeat;
+				margin-top: 18px;
+				margin-left: 10px;
+			}
+		}
+		input{
+			position: relative;
+			z-index: 10;
+		}
+	}
+	.btn-top{
+		height: 50px;
+	}
+}
+
+.form-container{
+	text-align: center;
+	padding-top: 85px;
+	img{
+		&.logo{
+			margin-bottom: 50px;
+			margin-left: auto;
+			margin-right: auto;
+			width: 96px;
+			height: 149px;
+			background: url('/public/logo.png') no-repeat;
+			background: url('/public/logo.svg') no-repeat;
+			content: '';
+			display: block;
+		}
+	}
+}
