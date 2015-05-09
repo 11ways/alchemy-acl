@@ -26,25 +26,28 @@ var User = Model.extend(function UserModel(options) {
 	// Create the chimera behaviour
 	chimera = this.addBehaviour('chimera');
 
-	// Get the list group
-	list = chimera.getActionFields('list');
+	if (chimera) {
 
-	list.addField('username');
-	list.addField('name');
+		// Get the list group
+		list = chimera.getActionFields('list');
 
-	// Get the edit group
-	edit = chimera.getActionFields('edit');
+		list.addField('username');
+		list.addField('name');
 
-	edit.addField('username');
-	edit.addField('name');
-	edit.addField('password');
-	edit.addField('acl_group_id');
+		// Get the edit group
+		edit = chimera.getActionFields('edit');
 
-	// Get the view group
-	view = chimera.getActionFields('view');
+		edit.addField('username');
+		edit.addField('name');
+		edit.addField('password');
+		edit.addField('acl_group_id');
 
-	view.addField('username');
-	view.addField('name');
+		// Get the view group
+		view = chimera.getActionFields('view');
+
+		view.addField('username');
+		view.addField('name');
+	}
 
 	this.on('saving', function beforeSave(data, options, creating) {
 
@@ -83,6 +86,57 @@ User.constitute(function addFields() {
 	this.addField('password', 'Password');
 
 	this.hasAndBelongsToMany('AclGroup');
+});
+
+/**
+ * Constitute the class wide schema
+ *
+ * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @since    1.0.0
+ * @version  1.0.0
+ *
+ * @param    {String}   existing   The existing session to remove
+ * @param    {Function} callback
+ */
+User.setDocumentMethod(function createPersistentCookie(existing, callback) {
+
+	var Persistent,
+	    that = this;
+
+	if (typeof existing == 'function') {
+		callback = existing;
+		existing = null;
+	}
+
+	Persistent = Model.get('AclPersistentCookie');
+
+	Function.parallel(function session(next) {
+		Crypto.randomHex(16, next);
+	}, function token(next) {
+		Crypto.randomHex(16, next);
+	}, function done(err, result) {
+
+		var data;
+
+		if (err) {
+			return callback(err);
+		}
+
+		data = {
+			identifier: result[0],
+			token: result[1],
+			user_id: that._id
+		};
+
+		Persistent.save(data, function saved(err) {
+
+			if (err) {
+				return callback(err);
+			}
+
+			callback(null, data);
+		});
+	});
 });
 
 return;

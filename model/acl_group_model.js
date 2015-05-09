@@ -19,23 +19,25 @@ var Group = Model.extend(function AclGroupModel(options) {
 	// Create the chimera behaviour
 	chimera = this.addBehaviour('chimera');
 
-	// Get the list group
-	list = chimera.getActionFields('list');
+	if (chimera) {
+		// Get the list group
+		list = chimera.getActionFields('list');
 
-	list.addField('name');
-	list.addField('weight');
+		list.addField('name');
+		list.addField('weight');
 
-	// Get the edit group
-	edit = chimera.getActionFields('edit');
+		// Get the edit group
+		edit = chimera.getActionFields('edit');
 
-	edit.addField('name');
-	edit.addField('weight');
+		edit.addField('name');
+		edit.addField('weight');
 
-	// Get the view group
-	view = chimera.getActionFields('view');
+		// Get the view group
+		view = chimera.getActionFields('view');
 
-	view.addField('name');
-	view.addField('weight');
+		view.addField('name');
+		view.addField('weight');
+	}
 });
 
 /**

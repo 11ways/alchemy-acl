@@ -23,24 +23,27 @@ var AclRule = Model.extend(function AclRuleModel(options) {
 	// Create the chimera behaviour
 	chimera = this.addBehaviour('chimera');
 
-	// Get the list group
-	list = chimera.getActionFields('list');
+	if (chimera) {
 
-	list.addField('_id');
+		// Get the list group
+		list = chimera.getActionFields('list');
 
-	// Get the edit group
-	edit = chimera.getActionFields('edit');
+		list.addField('_id');
 
-	edit.addField('type');
-	edit.addField('target_groups_id');
-	edit.addField('target_users_id');
+		// Get the edit group
+		edit = chimera.getActionFields('edit');
 
-	edit.addField('settings');
+		edit.addField('type');
+		edit.addField('target_groups_id');
+		edit.addField('target_users_id');
 
-	// Get the view group
-	view = chimera.getActionFields('view');
+		edit.addField('settings');
 
-	view.addField('type');
+		// Get the view group
+		view = chimera.getActionFields('view');
+
+		view.addField('type');
+	}
 });
 
 /**

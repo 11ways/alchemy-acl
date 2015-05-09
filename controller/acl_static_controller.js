@@ -39,32 +39,25 @@ AclStatic.setMethod(function loginPost(conduit) {
 	var that = this,
 	    conditions,
 	    username,
-	    password;
+	    password,
+	    remember;
 
 	username = conduit.body.username;
 	password = conduit.body.password;
-
-	pr(conduit.body, true);
+	remember = conduit.body.remember === 'on';
 
 	if (!username || !password) {
-		pr('Body not set?');
-		return this.notAuthorized();
+		return conduit.notAuthorized();
 	}
 
-	Model.get('User').find('first', {conditions: {username: username}}, function gotUser(err, items) {
-
-		var record;
+	Model.get('User').find('first', {conditions: {username: username}}, function gotUser(err, record) {
 
 		if (err != null) {
 			return that.error(err);
 		}
 
-		record = items[0];
-
 		if (!record) {
 			return conduit.notAuthorized(true);
-		} else {
-			record = record.User;
 		}
 
 		bcrypt.compare(password, record.password, function compared(err, match) {
@@ -74,7 +67,7 @@ AclStatic.setMethod(function loginPost(conduit) {
 			}
 
 			if (match) {
-				that.allow(record);
+				that.allow(record, remember);
 			} else {
 				conduit.notAuthorized(true);
 			}
@@ -106,11 +99,13 @@ AclStatic.setMethod(function logout() {
  * @since    0.0.1
  * @version  1.0.0
  *
- * @param    {Object}   UserData
+ * @param    {UserDocument}   UserData
+ * @param    {Boolean}        remember
  */
-AclStatic.setMethod(function allow(UserData) {
+AclStatic.setMethod(function allow(UserData, remember) {
 
-	var afterLogin = this.session('afterLogin');
+	var afterLogin = this.session('afterLogin'),
+	    that = this;
 
 	// Remove the session
 	this.session('afterLogin', null);
@@ -122,7 +117,14 @@ AclStatic.setMethod(function allow(UserData) {
 	// Store the userdata in the session
 	this.session('UserData', UserData);
 
-	this.conduit.redirect(afterLogin);
+	if (remember) {
+		UserData.createPersistentCookie(function gotCookie(err, result) {
+			that.cookie('acpl', {i: result.identifier, t: result.token}, {expires: 'never'});
+			that.conduit.redirect(afterLogin);
+		});
+	} else {
+		that.conduit.redirect(afterLogin);
+	}
 });
 
 /**
@@ -205,13 +207,17 @@ Router.use(function checkUrl(req, res, next) {
 		sort: {'settings.order': 'DESC'}
 	};
 
-	Model.get('AclRule').find('all', options, function gotRules(err, rules) {
+	req.conduit.getModel('AclRule').find('all', options, function gotRules(err, rules) {
 
 		var allowed = true,
 		    sharedGroup,
 		    sharedUser,
 		    rule,
 		    i;
+
+		if (err) {
+			return next(err);
+		}
 
 		for (i = 0; i < rules.length; i++) {
 			rule = rules[i].AclRule;

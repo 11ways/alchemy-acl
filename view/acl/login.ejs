@@ -1,30 +1,23 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title></title>
-		<% this.foundation() %>
-		<% style('chimera/chimera') %>
-		<% style('login') %>
-		<script>
-			var Blast = __Protoblast;
-			Blast.__init(true);
-		</script>
-	</head>
-	<body>
-		<% if (authError) { %>
-			<p><%= authError %></p>
-		<% } %>
-		<div class="form-container">
-			<img src="/public/logo.png" class="logo" alt="Rooffood" />
-			<form action="/login" method="POST">
-				<div class="user">
-					<input type="text" name="username" placeholder="login">
-				</div>
-				<div class="password">
-					<input type="password" name="password" placeholder="password">
-				</div>
-				<input type="submit" class="btn-top" value="Login">
-			</form>
-		</div>
-	</body>
-</html>
+<% config = expose('acl-view-setting') %>
+<% expands(config.bodylayout) %>
+
+<% start(config.mainblock) %>
+	<% if (authError) { %>
+		<p><%= authError %></p>
+	<% } %>
+	<div class="form-container">
+		<img src="/public/logo.png" class="logo" alt="Logo" />
+		<form action="/login" method="POST">
+			<div class="user">
+				<input type="text" name="username" placeholder="login" tabindex="1">
+			</div>
+			<div class="password">
+				<input type="password" name="password" placeholder="password" tabindex="2" autocorrect="off" required>
+			</div>
+			<div class="remember">
+				<label><input type="checkbox" name="remember" tabindex="3"> Remember me</label>
+			</div>
+			<input type="submit" class="btn-top" value="Login">
+		</form>
+	</div>
+<% end(config.mainblock) %>

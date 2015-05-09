@@ -1,0 +1,20 @@
+<% makeDialog() %>
+
+<% if (authError) { %>
+	<p><%= authError %></p>
+<% } %>
+<div class="form-container">
+	<img src="/public/logo.png" class="logo" alt="Logo" />
+	<form action="/login?h_diversion=modal" method="POST">
+		<div class="user">
+			<input type="text" name="username" placeholder="login" tabindex="1">
+		</div>
+		<div class="password">
+			<input type="password" name="password" placeholder="password" tabindex="2" autocorrect="off" required>
+		</div>
+		<div class="remember">
+			<label><input type="checkbox" name="remember" tabindex="3"> Remember me</label>
+		</div>
+		<input type="submit" class="btn-top" value="Login">
+	</form>
+</div>
