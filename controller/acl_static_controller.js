@@ -60,6 +60,10 @@ AclStatic.setMethod(function loginPost(conduit) {
 			return conduit.notAuthorized(true);
 		}
 
+		if (!bcrypt) {
+			return conduit.error(new Error('Password comparison error'));
+		}
+
 		bcrypt.compare(password, record.password, function compared(err, match) {
 
 			if (err != null) {
