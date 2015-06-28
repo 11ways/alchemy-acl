@@ -16,38 +16,7 @@ if (alchemy.classes.UserModel) {
  */
 var User = Model.extend(function UserModel(options) {
 
-	var chimera,
-	    list,
-	    edit,
-	    view;
-
 	UserModel.super.call(this, options);
-
-	// Create the chimera behaviour
-	chimera = this.addBehaviour('chimera');
-
-	if (chimera) {
-
-		// Get the list group
-		list = chimera.getActionFields('list');
-
-		list.addField('username');
-		list.addField('name');
-
-		// Get the edit group
-		edit = chimera.getActionFields('edit');
-
-		edit.addField('username');
-		edit.addField('name');
-		edit.addField('password');
-		edit.addField('acl_group_id');
-
-		// Get the view group
-		view = chimera.getActionFields('view');
-
-		view.addField('username');
-		view.addField('name');
-	}
 
 	this.on('saving', function beforeSave(data, options, creating) {
 
@@ -81,11 +50,67 @@ var User = Model.extend(function UserModel(options) {
  * @version  1.0.0
  */
 User.constitute(function addFields() {
+
+	var field,
+	    i;
+
 	this.addField('username', 'String');
-	this.addField('name', 'String');
 	this.addField('password', 'Password');
 
+	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
+		field = alchemy.plugins.acl.userModelFields[i];
+
+		this.addField.apply(this, field);
+	}
+
 	this.hasAndBelongsToMany('AclGroup');
+});
+
+/**
+ * Configure chimera for this model
+ *
+ * @author   Jelle De Loecker <jelle@develry.be>
+ * @since    1.0.0
+ * @version  1.0.0
+ */
+User.constitute(function chimeraConfig() {
+
+	var field,
+	    list,
+	    edit,
+	    view,
+	    i;
+
+	if (!this.chimera) {
+		return;
+	}
+
+	// Get the list group
+	list = this.chimera.getActionFields('list');
+
+	list.addField('username');
+
+	// Get the edit group
+	edit = this.chimera.getActionFields('edit');
+
+	edit.addField('username');
+	edit.addField('password');
+	edit.addField('acl_group_id');
+
+	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
+		field = alchemy.plugins.acl.userModelFields[i];
+		edit.addField(field[0]);
+	}
+
+	// Get the view group
+	view = this.chimera.getActionFields('view');
+
+	view.addField('username');
+
+	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
+		field = alchemy.plugins.acl.userModelFields[i];
+		view.addField(field[0]);
+	}
 });
 
 /**

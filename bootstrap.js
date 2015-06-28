@@ -51,6 +51,12 @@ var options = {
 	// Placeholder variables to use in certain strings
 	placeholders: {},
 
+	// User model extra fields
+	userModelFields: [
+		['first_name', 'String'],
+		['last_name', 'String']
+	],
+
 	// The everyone group id
 	EveryoneGroupId: alchemy.ObjectId('52efff0000A1C00001000000'),
 

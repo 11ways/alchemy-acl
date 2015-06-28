@@ -62,6 +62,8 @@ AclRule.constitute(function addFields() {
 
 	this.hasAndBelongsToMany('TargetUsers', 'User');
 	this.hasAndBelongsToMany('TargetGroups', 'AclGroup');
+
+	console.log('CHIMERA?', this.chimera);
 });
 
 /**
