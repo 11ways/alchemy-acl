@@ -31,13 +31,13 @@ var options = {
 	rounds: 10,
 
 	// The name of the base layout
-	baselayout: 'acl_base',
+	baselayout: 'layouts/acl_base',
 
 	// The name of the body layout
-	bodylayout: 'acl_body',
+	bodylayout: 'layouts/acl_body',
 
 	// The main layout
-	mainlayout: 'acl_main',
+	mainlayout: 'layouts/acl_main',
 
 	// The name of the body block
 	bodyblock: 'acl-base',
@@ -50,6 +50,12 @@ var options = {
 
 	// Placeholder variables to use in certain strings
 	placeholders: {},
+
+	// User model extra fields
+	userModelFields: [
+		['first_name', 'String'],
+		['last_name', 'String']
+	],
 
 	// The everyone group id
 	EveryoneGroupId: alchemy.ObjectId('52efff0000A1C00001000000'),
@@ -65,7 +71,7 @@ var options = {
 };
 
 // Inject the user-overridden options
-alchemy.plugins.acl = alchemy.inject(options, alchemy.plugins.acl);
+alchemy.plugins.acl = Object.assign(options, alchemy.plugins.acl);
 
 // Make sure the model name is correct
 options.model = options.model.modelName();
@@ -101,6 +107,108 @@ ensureGroups[ensureGroups.length] = {
 	weight: 10001
 };
 
+setTimeout(function ensureData() {
+	var AclGroup    = Model.get('AclGroup'),
+	    User        = Model.get('User'),
+	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
+	    SuperUserId      = alchemy.plugins.acl.SuperUserId;
+
+	// Make sure the required ACL groups exist
+	AclGroup.ensureIds(ensureGroups);
+
+	// Make sure the super user exists
+	User.ensureIds({
+		_id: SuperUserId,
+		username: 'admin',
+		name: 'Superuser',
+		password: '$2a$10$sTLrARZ6hEJwnof6f6ZLDO2L.i.oumyWFC2jC4FB2k3fdkfszYzZC', // "admin"
+		acl_group_id: [SuperUserGroupId]
+	});
+}, 4);
+
+// Get the view settings
+var viewSettings = {
+	baselayout: options.baselayout,
+	bodylayout: options.bodylayout,
+	mainlayout: options.mainlayout,
+	bodyblock: options.bodyblock,
+	mainblock: options.mainblock,
+	contentblock: options.contentblock,
+	username: options.username,
+	password: options.password
+};
+
+/**
+ * Look for persistent login cookies
+ *
+ * @author        Jelle De Loecker   <jelle@kipdola.be>
+ * @since         1.0.0
+ * @version       1.0.0
+ */
+Router.use(function persistentLoginCheck(req, res, next) {
+
+	var acpl,
+	    conduit = req.conduit,
+	    Persistent;
+
+	// Do nothing if userdata is already set
+	if (conduit.session('UserData')) {
+		return next();
+	}
+
+	// Get the persistent cookie
+	acpl = conduit.cookie('acpl');
+
+	if (acpl) {
+		Persistent = conduit.getModel('AclPersistentCookie');
+
+		Persistent.find('first', {conditions: {identifier: acpl.i, token: acpl.t}}, function gotCookie(err, cookie) {
+			if (!err && cookie.length && cookie[0].User) {
+				conduit.getModel('User').find('first', {conditions: {_id: cookie[0].User._id}}, function gotUser(err, user) {
+					conduit.session('UserData', user);
+				});
+			}
+
+			next();
+		});
+	} else {
+		next();
+	}
+}, {weight: 99999});
+
+// Send the acl layout options to the client
+alchemy.hawkejs.on({type: 'viewrender', status: 'begin', client: false}, function onBegin(viewRender) {
+	// Expose the viewsettings only once (they don't change)
+	viewRender.expose('acl-view-setting', viewSettings);
+});
+
+// Send the user info to the client
+alchemy.hawkejs.on({type: 'viewrender', status: 'begin'}, function onBegin(viewRender) {
+
+	var data,
+	    user;
+
+	if (!viewRender.conduit) {
+		return;
+	}
+
+	data = viewRender.conduit.session('UserData');
+
+	if (data) {
+		data = data.User;
+	}
+
+	if (data && data.username) {
+
+		user = Object.assign({}, data);
+		delete user.password;
+
+		viewRender.expose('acl-user-data', user);
+	}
+});
+
+
+return;
 
 // Get the view settings
 var viewSettings = {
@@ -113,28 +221,6 @@ var viewSettings = {
 	username: options.username,
 	password: options.password
 };
-
-// Create route connections, which can be overridden
-alchemy.connect('ACL::loginform', '/login', {
-	controller: 'AclStatic',
-	action: 'loginForm',
-	method: 'get',
-	order: 20
-});
-
-alchemy.connect('ACL::loginuser', '/acl/login', {
-	controller: 'AclStatic',
-	action: 'loginUser',
-	method: 'post',
-	order: 20
-});
-
-alchemy.connect('ACL::unauthorized', '/acl/unauthorized', {
-	controller: 'AclStatic',
-	action: 'unauthorized',
-	method: 'get',
-	order: 20
-});
 
 // Add the middleware to intercept the routes
 alchemy.addMiddleware(99, 'acl-routes', function(req, res, next){
@@ -164,23 +250,3 @@ alchemy.on('render.callback', function(render, callback) {
 	
 	callback();
 });
-
-alchemy.sputnik.after('datasources', function() {
-	
-	var AclGroup    = Model.get('AclGroup'),
-	    User        = Model.get('User'),
-	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
-	    SuperUserId      = alchemy.plugins.acl.SuperUserId;
-
-	// Make sure the required ACL groups exist
-	AclGroup.ensureIds(ensureGroups);
-
-	// Make sure the super user exists
-	User.ensureIds({
-		_id: SuperUserId,
-		username: 'admin',
-		name: 'Superuser',
-		acl_group_id: [SuperUserGroupId]
-	});
-});
-

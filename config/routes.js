@@ -1,1 +1,3 @@
-alchemy.connect('Logout', '/logout', {controller: 'acl_static', action: 'logout'});
+Router.get('LoginForm', '/login', 'AclStatic#loginForm');
+Router.post('LoginPost', '/login', 'AclStatic#loginPost');
+Router.get('Logout', '/logout', 'AclStatic#logout');

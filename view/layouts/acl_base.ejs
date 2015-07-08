@@ -2,8 +2,9 @@
 <html>
 	<head>
 		<title></title>
+		<% this.foundation() %>
 	</head>
 	<body>
-		<% assign(store('acl-view-setting').bodyblock) %>
+		<% assign(expose('acl-view-setting').bodyblock) %>
 	</body>
 </html>

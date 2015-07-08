@@ -1,70 +1,23 @@
-<% expands(store('acl-view-setting').mainlayout) %>
+<% config = expose('acl-view-setting') %>
+<% expands(config.bodylayout) %>
 
-<% asset.style('aclbase', {block: 'head'}) %>
-
-<% start(store('acl-view-setting').contentblock) %>
-
-	<div id="error">
-		<% if (authError) { %>
-			<%= authError %>
-		<% } %>
+<% start(config.mainblock) %>
+	<% if (authError) { %>
+		<p><%= authError %></p>
+	<% } %>
+	<div class="form-container">
+		<img src="/public/logo.png" class="logo" alt="Logo" />
+		<form action="/login" method="POST">
+			<div class="user">
+				<input type="text" name="username" placeholder="login" tabindex="1">
+			</div>
+			<div class="password">
+				<input type="password" name="password" placeholder="password" tabindex="2" autocorrect="off" required>
+			</div>
+			<div class="remember">
+				<label><input type="checkbox" name="remember" tabindex="3"> Remember me</label>
+			</div>
+			<input type="submit" class="btn-top" value="Login">
+		</form>
 	</div>
-
-	<% form.create('login', {id: 'AclLogin', action: '/acl/login'}) %>
-		<h2 class="form-signin-heading">Login</h2>
-		<% form.input(store('acl-view-setting').username, {placeholder: 'Username'}) %>
-		<% form.input(store('acl-view-setting').password, {placeholder: 'Password', type: 'password'}) %>
-	<% form.end('login', {title: 'Log In'}) %>
-
-	<style type="text/css">
-		body {
-			padding-top: 40px;
-			padding-bottom: 40px;
-			background-color: #f5f5f5;
-		}
-
-		#AclLogin {
-			max-width: 300px;
-			padding: 19px 29px 29px;
-			margin: 0 auto 20px;
-			background-color: #fff;
-			border: 1px solid #e5e5e5;
-			-webkit-border-radius: 5px;
-				 -moz-border-radius: 5px;
-							border-radius: 5px;
-			-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-				 -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-							box-shadow: 0 1px 2px rgba(0,0,0,.05);
-		}
-		#AclLogin .form-signin-heading,
-		#AclLogin .checkbox {
-			margin-bottom: 10px;
-		}
-		#AclLogin input[type="text"],
-		#AclLogin input[type="password"] {
-			font-size: 16px;
-			height: auto;
-			margin-bottom: 15px;
-			padding: 7px 9px;
-		}
-	</style>
-	<script>
-		$('#login').click(function(e) {
-			e.preventDefault();
-			var loginData = $('#loginform').jsonify();
-			$('#error').html('');
-			$('.control-group').removeClass('error');
-			
-			$.post('/acl/login', loginData, function(data) {
-				if (data.error) {
-					$('#error').html('<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Warning!</strong> Login failed!</div>');
-					for (var input in data.errors.errors) {
-						$('[name="' + input + '"]').parent().addClass('error');
-					}
-				} else if (data.redirect) {
-					window.location = data.redirect;
-				}
-			});
-		});
-	</script>
-<% end(store('acl-view-setting').contentblock) %>
+<% end(config.mainblock) %>
