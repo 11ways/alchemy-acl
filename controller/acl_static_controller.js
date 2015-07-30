@@ -53,10 +53,10 @@ AclStatic.setMethod(function loginPost(conduit) {
 	Model.get('User').find('first', {conditions: {username: username}}, function gotUser(err, record) {
 
 		if (err != null) {
-			return that.error(err);
+			return conduit.error(err);
 		}
 
-		if (!record) {
+		if (!record.length) {
 			return conduit.notAuthorized(true);
 		}
 
@@ -67,7 +67,7 @@ AclStatic.setMethod(function loginPost(conduit) {
 		bcrypt.compare(password, record.password, function compared(err, match) {
 
 			if (err != null) {
-				return that.error(err);
+				return conduit.error(err);
 			}
 
 			if (match) {
