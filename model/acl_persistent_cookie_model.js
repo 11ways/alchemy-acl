@@ -3,9 +3,9 @@
  *
  * @constructor
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  */
 var Persistent = Model.extend(function AclPersistentCookieModel(options) {
 
@@ -14,9 +14,9 @@ var Persistent = Model.extend(function AclPersistentCookieModel(options) {
 /**
  * Constitute the class wide schema
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
- * @since    1.0.0
- * @version  1.0.0
+ * @author   Jelle De Loecker   <jelle@develry.be>
+ * @since    0.2.0
+ * @version  0.2.0
  */
 Persistent.constitute(function addFields() {
 

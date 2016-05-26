@@ -1,13 +1,20 @@
 {
 	"name": "alchemy-acl",
 	"description": "ACL plugin for Alchemy MVC",
-	"version": "1.0.0",
+	"version": "0.2.0",
+	"author": "Jelle De Loecker <jelle@develry.be>",
+	"keywords": [
+		"alchemy",
+		"alchemymvc",
+		"plugin",
+		"acl"
+	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/codedor/alchemy-acl.git"
+		"url": "https://github.com/skerit/alchemy-acl.git"
 	},
 	"license": "MIT",
 	"engines": {
-		"node": ">=0.10"
+		"node": "~4.5.0"
 	}
 }

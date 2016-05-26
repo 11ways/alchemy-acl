@@ -10,7 +10,7 @@ var bcrypt = alchemy.use('bcrypt'),
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  */
 var AclStatic = Function.inherits('AppController', function AclStaticController(conduit, options) {
 	AclStaticController.super.call(this, conduit, options);
@@ -21,7 +21,7 @@ var AclStatic = Function.inherits('AppController', function AclStaticController(
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  */
 AclStatic.setMethod(function loginForm(conduit) {
 	this.render('acl/login');
@@ -32,7 +32,7 @@ AclStatic.setMethod(function loginForm(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  */
 AclStatic.setMethod(function loginPost(conduit) {
 
@@ -84,7 +84,7 @@ AclStatic.setMethod(function loginPost(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  */
 AclStatic.setMethod(function logout() {
 
@@ -101,7 +101,7 @@ AclStatic.setMethod(function logout() {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  *
  * @param    {UserDocument}   UserData
  * @param    {Boolean}        remember
@@ -135,8 +135,8 @@ AclStatic.setMethod(function allow(UserData, remember) {
  * The current user is not authorized and needs to log in
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
- * @since    1.0.0
- * @version  1.0.0
+ * @since    0.2.0
+ * @version  0.2.0
  *
  * @param    {Boolean}   triedAuth   Indicate that this was an auth attempt
  */
@@ -168,8 +168,8 @@ Conduit.setMethod(function notAuthorized(triedAuth) {
  * The current user is authenticated, but not allowed
  *
  * @author        Jelle De Loecker   <jelle@kipdola.be>
- * @since         1.0.0
- * @version       1.0.0
+ * @since         0.2.0
+ * @version       0.2.0
  */
 Conduit.setMethod(function forbidden() {
 

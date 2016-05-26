@@ -5,9 +5,9 @@ var AclPlugin = alchemy.plugins.acl;
  *
  * @constructor
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  */
 var AclRule = Model.extend(function AclRuleModel(options) {
 
@@ -49,9 +49,9 @@ var AclRule = Model.extend(function AclRuleModel(options) {
 /**
  * Constitute the class wide schema
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
- * @since    1.0.0
- * @version  1.0.0
+ * @author   Jelle De Loecker   <jelle@develry.be>
+ * @since    0.2.0
+ * @version  0.2.0
  */
 AclRule.constitute(function addFields() {
 
@@ -68,9 +68,9 @@ AclRule.constitute(function addFields() {
 /**
  * Get all the rules that apply to the given user
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  *
  * @param    {Object}   user      The user object as it is in the session
  * @param    {Function} callback  The function to pass the rules to

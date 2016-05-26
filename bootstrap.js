@@ -142,8 +142,8 @@ var viewSettings = {
  * Look for persistent login cookies
  *
  * @author        Jelle De Loecker   <jelle@kipdola.be>
- * @since         1.0.0
- * @version       1.0.0
+ * @since         0.2.0
+ * @version       0.2.0
  */
 Router.use(function persistentLoginCheck(req, res, next) {
 

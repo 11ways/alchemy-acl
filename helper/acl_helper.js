@@ -7,9 +7,9 @@ module.exports = function HawkejsMedia(Hawkejs, Blast) {
 	/**
 	 * Get the data object
 	 *
-	 * @author   Jelle De Loecker   <jelle@codedor.be>
-	 * @since    1.0.0
-	 * @version  1.0.0
+	 * @author   Jelle De Loecker   <jelle@develry.be>
+	 * @since    0.2.0
+	 * @version  0.2.0
 	 *
 	 * @return   {Object}
 	 */
@@ -20,9 +20,9 @@ module.exports = function HawkejsMedia(Hawkejs, Blast) {
 	/**
 	 * Set loggedIn property getter
 	 *
-	 * @author   Jelle De Loecker   <jelle@codedor.be>
-	 * @since    1.0.0
-	 * @version  1.0.0
+	 * @author   Jelle De Loecker   <jelle@develry.be>
+	 * @since    0.2.0
+	 * @version  0.2.0
 	 *
 	 * @return   {Boolean}
 	 */
@@ -40,9 +40,9 @@ module.exports = function HawkejsMedia(Hawkejs, Blast) {
 	/**
 	 * Set username property getter
 	 *
-	 * @author   Jelle De Loecker   <jelle@codedor.be>
-	 * @since    1.0.0
-	 * @version  1.0.0
+	 * @author   Jelle De Loecker   <jelle@develry.be>
+	 * @since    0.2.0
+	 * @version  0.2.0
 	 *
 	 * @return   {String}
 	 */
@@ -60,9 +60,9 @@ module.exports = function HawkejsMedia(Hawkejs, Blast) {
 	/**
 	 * Set name property getter
 	 *
-	 * @author   Jelle De Loecker   <jelle@codedor.be>
-	 * @since    1.0.0
-	 * @version  1.0.0
+	 * @author   Jelle De Loecker   <jelle@develry.be>
+	 * @since    0.2.0
+	 * @version  0.2.0
 	 *
 	 * @return   {String}
 	 */

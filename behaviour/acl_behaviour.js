@@ -8,9 +8,9 @@ var dataTypes = alchemy.shared('Acl.dataTypes'),
  * @constructor
  * @extends       alchemy.classes.Behaviour
  *
- * @author        Jelle De Loecker   <jelle@codedor.be>
+ * @author        Jelle De Loecker   <jelle@develry.be>
  * @since         0.0.1
- * @version       1.0.0
+ * @version       0.2.0
  */
 var Acl = Function.inherits('Behaviour', function AclBehaviour(model, options) {
 
@@ -22,7 +22,7 @@ Acl.setProperty('dataTypes', dataTypes);
 /**
  * Get all the rule types that can be applied
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
  * @version  0.1.0
  */
@@ -107,7 +107,7 @@ Acl.setMethod(function getTypesToApply(callback) {
 /**
  * Launch the beforeRemove methods of the rule types, if they are defined
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
  * @version  0.0.1
  */
@@ -158,7 +158,7 @@ Acl.setMethod(function beforeRemove(next, data) {
 /**
  * Launch the beforeFind methods of the rule types, if they are defined
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
  * @version  0.1.0
  */
@@ -211,7 +211,7 @@ Acl.setMethod(function beforeFind(next, options) {
 /**
  * Add in-item acl conditions
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.1.0
  * @version  0.1.0
  */
@@ -294,7 +294,7 @@ Acl.setMethod(function beforeFindInItem(options) {
 /**
  * Launch the afterFind methods of the rule types, if they are defined
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
  * @version  0.0.1
  */
@@ -340,7 +340,7 @@ Acl.setMethod(function afterFind(next, err, results, primary, alias) {
 /**
  * Launch the beforeSave methods of the rule types, if they are defined
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
  * @version  0.0.1
  */

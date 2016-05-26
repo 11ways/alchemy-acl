@@ -3,9 +3,9 @@
  *
  * @constructor
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  */
 var Group = Model.extend(function AclGroupModel(options) {
 
@@ -43,9 +43,9 @@ var Group = Model.extend(function AclGroupModel(options) {
 /**
  * Constitute the class wide schema
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
- * @since    1.0.0
- * @version  1.0.0
+ * @author   Jelle De Loecker   <jelle@develry.be>
+ * @since    0.2.0
+ * @version  0.2.0
  */
 Group.constitute(function addFields() {
 	this.addField('name', 'String');

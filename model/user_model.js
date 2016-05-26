@@ -10,9 +10,9 @@ if (alchemy.classes.UserModel) {
  *
  * @constructor
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
+ * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  1.0.0
+ * @version  0.2.0
  */
 var User = Model.extend(function UserModel(options) {
 
@@ -43,11 +43,20 @@ var User = Model.extend(function UserModel(options) {
 });
 
 /**
+ * The default field to display is the 'username' one
+ *
+ * @author   Jelle De Loecker   <jelle@develry.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ */
+User.setProperty('displayField', 'username');
+
+/**
  * Constitute the class wide schema
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
- * @since    1.0.0
- * @version  1.0.0
+ * @author   Jelle De Loecker   <jelle@develry.be>
+ * @since    0.2.0
+ * @version  0.2.0
  */
 User.constitute(function addFields() {
 
@@ -70,8 +79,8 @@ User.constitute(function addFields() {
  * Configure chimera for this model
  *
  * @author   Jelle De Loecker <jelle@develry.be>
- * @since    1.0.0
- * @version  1.0.0
+ * @since    0.2.0
+ * @version  0.2.0
  */
 User.constitute(function chimeraConfig() {
 
@@ -116,9 +125,9 @@ User.constitute(function chimeraConfig() {
 /**
  * Constitute the class wide schema
  *
- * @author   Jelle De Loecker   <jelle@codedor.be>
- * @since    1.0.0
- * @version  1.0.0
+ * @author   Jelle De Loecker   <jelle@develry.be>
+ * @since    0.2.0
+ * @version  0.2.0
  *
  * @param    {String}   existing   The existing session to remove
  * @param    {Function} callback
@@ -171,7 +180,7 @@ return;
 	/**
 	 * The preInit constructor
 	 *
-	 * @author   Jelle De Loecker   <jelle@codedor.be>
+	 * @author   Jelle De Loecker   <jelle@develry.be>
 	 * @since    0.0.1
 	 * @version  0.0.1
 	 */
