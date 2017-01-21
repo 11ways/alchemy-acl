@@ -1,7 +1,7 @@
 var bcrypt = alchemy.use('bcrypt');
 
 // Don't load this file if a user model already exists
-if (alchemy.classes.UserModel) {
+if (Classes.Alchemy.UserModel) {
 	return;
 }
 
@@ -88,6 +88,7 @@ User.constitute(function chimeraConfig() {
 	    list,
 	    edit,
 	    view,
+	    peek,
 	    i;
 
 	if (!this.chimera) {
@@ -120,6 +121,12 @@ User.constitute(function chimeraConfig() {
 		field = alchemy.plugins.acl.userModelFields[i];
 		view.addField(field[0]);
 	}
+
+	// Get the peek group
+	peek = this.chimera.getActionFields('peek');
+
+	peek.addField('username');
+	peek.addField('acl_group_id');
 });
 
 /**
@@ -171,94 +178,4 @@ User.setDocumentMethod(function createPersistentCookie(existing, callback) {
 			callback(null, data);
 		});
 	});
-});
-
-return;
-
-(function(){
-
-	/**
-	 * The preInit constructor
-	 *
-	 * @author   Jelle De Loecker   <jelle@develry.be>
-	 * @since    0.0.1
-	 * @version  0.0.1
-	 */
-	this.preInit = function preInit() {
-
-		this.parent();
-
-		this.displayField = 'username';
-		
-		this.hasOneChild = {
-			NotificationSetting: {
-				modelName: 'NotificationSetting',
-				foreignKey: 'user_id'
-			}
-		};
-
-		this.hasAndBelongsToMany = {
-			AclGroup: {
-				modelName: 'AclGroup',
-				foreignKey: 'acl_group_id'
-			}
-		};
-		
-		this.blueprint = {
-			username: {
-				type: 'String',
-				index: {
-					unique: true,
-					name: 'username',
-					sparse: false,
-					order: 'asc'
-				}
-			},
-			name: {
-				type: 'String',
-				rules: {
-					notempty: {message: 'This field should not be empty!'}
-				}
-			},
-			password: {
-				type: 'Password',
-				rules: {
-					notempty: {
-						mesage: 'A password is required!'
-					}
-				}
-			}
-		};
-
-		this.modelEdit = {
-			general: {
-				title: __('chimera', 'General'),
-				fields: [
-					'username',
-					'name',
-					'password',
-					'acl_group_id'
-				]
-			}
-		};
-
-		this.modelIndex = {
-			fields: [
-				'created',
-				'username',
-				'name',
-				'acl_group_id'
-			]
-		};
-
-		this.actionLists = {
-			paginate: ['index', 'add'],
-			list: ['export'],
-			record: [
-				'view',
-				'edit',
-				'remove'
-			]
-		};
-	};
 });

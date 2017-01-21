@@ -1,6 +1,6 @@
 var bcrypt = alchemy.use('bcrypt'),
     AclPlugin = alchemy.plugins.acl,
-    Conduit = alchemy.classes.Conduit;
+    Conduit = Classes.Alchemy.Conduit;
 
 /**
  * The ACL Static Controller
@@ -10,9 +10,9 @@ var bcrypt = alchemy.use('bcrypt'),
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.2.0
+ * @version  0.3.0
  */
-var AclStatic = Function.inherits('AppController', function AclStaticController(conduit, options) {
+var AclStatic = Function.inherits('Alchemy.AppController', function AclStaticController(conduit, options) {
 	AclStaticController.super.call(this, conduit, options);
 });
 
@@ -181,73 +181,3 @@ Conduit.setMethod(function forbidden() {
 		this.notAuthorized();
 	}
 });
-
-Router.use(function checkUrl(req, res, next) {
-
-	var options,
-	    groups,
-	    users,
-	    user,
-	    path;
-	
-	path = req.conduit.url.pathname;
-	user = req.conduit.session('UserData');
-	groups = [AclPlugin.EveryoneGroupId];
-
-	if (user) {
-		groups.push(AclPlugin.LoggedInGroupId);
-		groups = groups.concat(user.acl_group_id);
-		users = [user._id];
-	} else {
-		user = {};
-		users = [];
-	}
-
-	options = {
-		conditions: {
-			'settings.url': {$type: 11}
-		},
-		recursive: 0,
-		sort: {'settings.order': 'DESC'}
-	};
-
-	req.conduit.getModel('AclRule').find('all', options, function gotRules(err, rules) {
-
-		var allowed = true,
-		    sharedGroup,
-		    sharedUser,
-		    rule,
-		    i;
-
-		if (err) {
-			return next(err);
-		}
-
-		for (i = 0; i < rules.length; i++) {
-			rule = rules[i].AclRule;
-
-			// See if this rule applies to this url
-			if (rule.settings.url.test(path)) {
-
-				// See if this rule applies to our user
-				sharedGroup = groups.shared(rule.target_groups_id, String);
-				sharedUser = users.shared(rule.target_users_id, String);
-
-				// If this rule matches a group or the user, use it
-				if (sharedGroup.length || sharedUser.length) {
-					allowed = rule.settings.allow;
-
-					if (rule.settings.halt) {
-						break;
-					}
-				}
-			}
-		}
-
-		if (!allowed) {
-			req.conduit.forbidden();
-		} else {
-			next();
-		}
-	});
-}, {weight: 9000});

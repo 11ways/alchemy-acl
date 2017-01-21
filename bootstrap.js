@@ -58,16 +58,16 @@ var options = {
 	],
 
 	// The everyone group id
-	EveryoneGroupId: alchemy.ObjectId('52efff0000A1C00001000000'),
+	EveryoneGroupId: alchemy.ObjectId('52efff0000a1c00001000000'),
 
 	// The logged in user group id
-	LoggedInGroupId: alchemy.ObjectId('52efff0000A1C00001000003'),
+	LoggedInGroupId: alchemy.ObjectId('52efff0000a1c00001000003'),
 
 	// The super user group id
-	SuperUserGroupId: alchemy.ObjectId('52efff0000A1C00001000001'),
+	SuperUserGroupId: alchemy.ObjectId('52efff0000a1c00001000001'),
 
 	// The super user id
-	SuperUserId: alchemy.ObjectId('52efff0000A1C00000000000')
+	SuperUserId: alchemy.ObjectId('52efff0000a1c00000000000')
 };
 
 // Inject the user-overridden options
@@ -107,7 +107,10 @@ ensureGroups[ensureGroups.length] = {
 	weight: 10001
 };
 
-setTimeout(function ensureData() {
+/**
+ * Ensure the ACL groups and SuperUser exist
+ */
+alchemy.sputnik.before('startServer', function beforeStartServer(done) {
 	var AclGroup    = Model.get('AclGroup'),
 	    User        = Model.get('User'),
 	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
@@ -124,7 +127,7 @@ setTimeout(function ensureData() {
 		password: '$2a$10$sTLrARZ6hEJwnof6f6ZLDO2L.i.oumyWFC2jC4FB2k3fdkfszYzZC', // "admin"
 		acl_group_id: [SuperUserGroupId]
 	});
-}, 4);
+});
 
 // Get the view settings
 var viewSettings = {
@@ -166,15 +169,27 @@ Router.use(function persistentLoginCheck(req, res, next) {
 			if (!err && cookie.length && cookie[0].User) {
 				conduit.getModel('User').find('first', {conditions: {_id: cookie[0].User._id}}, function gotUser(err, user) {
 					conduit.session('UserData', user);
+					next();
 				});
+			} else {
+				next();
 			}
-
-			next();
 		});
 	} else {
 		next();
 	}
 }, {weight: 99999});
+
+/**
+ * Check permissions
+ *
+ * @author        Jelle De Loecker   <jelle@develry.be>
+ * @since         0.3.0
+ * @version       0.3.0
+ */
+Router.use(function rulesCheck(req, res, next) {
+	req.conduit.getModel('AclRule').checkRequest(req, res, next);
+}, {weight: 99800});
 
 // Send the acl layout options to the client
 alchemy.hawkejs.on({type: 'viewrender', status: 'begin', client: false}, function onBegin(viewRender) {

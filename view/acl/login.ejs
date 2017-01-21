@@ -1,5 +1,6 @@
 <% config = expose('acl-view-setting') %>
 <% expands(config.bodylayout) %>
+<% style('login') %>
 
 <% start(config.mainblock) %>
 	<% if (authError) { %>
@@ -15,7 +16,10 @@
 				<input type="password" name="password" placeholder="password" tabindex="2" autocorrect="off" required>
 			</div>
 			<div class="remember">
-				<label><input type="checkbox" name="remember" tabindex="3"> Remember me</label>
+				<label>
+					<input type="checkbox" name="remember" tabindex="3">
+					<span>Remember me</span>
+				</label>
 			</div>
 			<input type="submit" class="btn-top" value="Login">
 		</form>
