@@ -146,7 +146,7 @@ var viewSettings = {
  *
  * @author        Jelle De Loecker   <jelle@kipdola.be>
  * @since         0.2.0
- * @version       0.2.0
+ * @version       0.4.0
  */
 Router.use(function persistentLoginCheck(req, res, next) {
 
@@ -155,7 +155,7 @@ Router.use(function persistentLoginCheck(req, res, next) {
 	    Persistent;
 
 	// Do nothing if userdata is already set
-	if (conduit.session('UserData')) {
+	if (conduit.getSession(false) && conduit.session('UserData')) {
 		return next();
 	}
 
@@ -168,7 +168,16 @@ Router.use(function persistentLoginCheck(req, res, next) {
 		Persistent.find('first', {conditions: {identifier: acpl.i, token: acpl.t}}, function gotCookie(err, cookie) {
 			if (!err && cookie.length && cookie[0].User) {
 				conduit.getModel('User').find('first', {conditions: {_id: cookie[0].User._id}}, function gotUser(err, user) {
-					conduit.session('UserData', user);
+
+					if (err) {
+						return next();
+					}
+
+					// Only set the user data if a user was actually found
+					if (user.length) {
+						conduit.session('UserData', user);
+					}
+
 					next();
 				});
 			} else {
@@ -220,48 +229,4 @@ alchemy.hawkejs.on({type: 'viewrender', status: 'begin'}, function onBegin(viewR
 
 		viewRender.expose('acl-user-data', user);
 	}
-});
-
-
-return;
-
-// Get the view settings
-var viewSettings = {
-	baselayout: alchemy.layoutify(options.baselayout),
-	bodylayout: alchemy.layoutify(options.bodylayout),
-	mainlayout: alchemy.layoutify(options.mainlayout),
-	bodyblock: options.bodyblock,
-	mainblock: options.mainblock,
-	contentblock: options.contentblock,
-	username: options.username,
-	password: options.password
-};
-
-// Add the middleware to intercept the routes
-alchemy.addMiddleware(99, 'acl-routes', function(req, res, next){
-	Model.get('AclPermission').checkRequest(req, res, next);
-});
-
-// Send the acl layout options to the client
-alchemy.on('render.callback', function(render, callback) {
-
-	var user = render.req.session.user,
-	    display = __('acl', 'Unnamed User');
-
-	// Only send this data on the initial pageload
-	if (!render.ajax) {
-		render.store('acl-view-setting', viewSettings);
-	}
-	
-	if(user){
-		if(user.first_name && user.last_name){
-			user.fullname = user.first_name + ' ' + user.last_name;
-		}
-		display = user.fullname || user.name || user.username || user.email;
-		render.viewVars.UserFullName = display;
-		render.viewVars.UserFirstName = user.first_name || user.username || '';
-		render.viewVars.UserLastName = user.last_name || '';
-	}
-	
-	callback();
 });

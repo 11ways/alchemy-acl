@@ -1,5 +1,9 @@
 Router.get('LoginForm', '/login', 'AclStatic#loginForm');
 Router.post('LoginPost', '/login', 'AclStatic#loginPost');
+
+Router.get('JoinForm', '/join', 'AclStatic#joinForm');
+Router.post('JoinPost', '/join', 'AclStatic#joinPost');
+
 Router.get('Logout', '/logout', 'AclStatic#logout');
 
 // Add models to the menu deck

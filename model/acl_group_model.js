@@ -28,12 +28,13 @@ Group.constitute(function addFields() {
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.3.0
- * @version  0.3.0
+ * @version  0.4.0
  */
 Group.constitute(function chimeraConfig() {
 
 	var list,
-	    edit;
+	    edit,
+	    view;
 
 	if (!this.chimera) {
 		return;

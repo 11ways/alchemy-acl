@@ -1,0 +1,18 @@
+<% if (authError) { %>
+	<p><%= authError %></p>
+<% } %>
+<div class="form-container">
+	<form action="/post<% if (is_modal) print('?h_diversion=modal') %>" method="POST">
+		<div class="user">
+			<input type="text" name="username" placeholder="login" tabindex="1">
+		</div>
+		<div class="password">
+			<input type="password" name="password" placeholder="password" tabindex="2" autocorrect="off" required>
+		</div>
+		<div class="password">
+			<input type="password" name="password2" placeholder="password" tabindex="3" autocorrect="off" required>
+		</div>
+
+		<input type="submit" class="btn-top" value="Login">
+	</form>
+</div>

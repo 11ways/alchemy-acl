@@ -17,6 +17,18 @@ var AclStatic = Function.inherits('Alchemy.AppController', function AclStaticCon
 });
 
 /**
+ * Render the join form (GET-only)
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.0.1
+ * @version  0.2.0
+ */
+AclStatic.setMethod(function joinForm(conduit) {
+	this.render('acl/join');
+});
+
+
+/**
  * Render the login form (GET-only)
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
