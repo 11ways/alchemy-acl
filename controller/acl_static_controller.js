@@ -27,7 +27,6 @@ AclStatic.setMethod(function joinForm(conduit) {
 	this.render('acl/join');
 });
 
-
 /**
  * Render the login form (GET-only)
  *
@@ -96,13 +95,16 @@ AclStatic.setMethod(function loginPost(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.2.0
+ * @version  0.4.0
  */
 AclStatic.setMethod(function logout() {
 
 	// Remove the user data from the session
 	this.session('afterLogin', null);
 	this.session('UserData', null);
+	this.cookie('acpl', null);
+
+	this.conduit.expose('acl-user-data', null);
 
 	// Redirect to the root
 	this.conduit.redirect('/');
@@ -148,7 +150,7 @@ AclStatic.setMethod(function allow(UserData, remember) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.2.0
- * @version  0.2.0
+ * @version  0.4.0
  *
  * @param    {Boolean}   triedAuth   Indicate that this was an auth attempt
  */
@@ -173,7 +175,12 @@ Conduit.setMethod(function notAuthorized(triedAuth) {
 	this.setHeader('x-fallback-url', '/login');
 
 	this.status = 401;
-	this.render('acl/login');
+
+	if (this.ajax) {
+		this.render('acl/login_modal');
+	} else {
+		this.render('acl/login');
+	}
 });
 
 /**

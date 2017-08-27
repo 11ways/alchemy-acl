@@ -9,6 +9,7 @@ Router.get('Logout', '/logout', 'AclStatic#logout');
 // Add models to the menu deck
 if (alchemy.plugins.chimera) {
 	alchemy.plugins.chimera.menu.set('acl_group', {
+		name : 'acl_groups',
 		title: 'ACL Groups',
 		route: 'chimera@ModelAction',
 		parameters: {
@@ -20,6 +21,7 @@ if (alchemy.plugins.chimera) {
 	});
 
 	alchemy.plugins.chimera.menu.set('acl_rule', {
+		name : 'acl_rules',
 		title: 'ACL Rules',
 		route: 'chimera@ModelAction',
 		parameters: {
