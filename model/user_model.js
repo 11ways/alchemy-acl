@@ -1,7 +1,7 @@
 var bcrypt = alchemy.use('bcrypt');
 
 // Don't load this file if a user model already exists
-if (Classes.Alchemy.UserModel || alchemy.plugins.acl.custom_model) {
+if (Classes.Alchemy.Model.User || alchemy.plugins.acl.custom_model) {
 	return;
 }
 
@@ -12,11 +12,11 @@ if (Classes.Alchemy.UserModel || alchemy.plugins.acl.custom_model) {
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  0.2.0
+ * @version  0.5.0
  */
-var User = Model.extend(function UserModel(options) {
+var User = Function.inherits('Alchemy.Model', function User(options) {
 
-	UserModel.super.call(this, options);
+	User.super.call(this, options);
 
 	this.on('saving', function beforeSave(data, options, creating) {
 

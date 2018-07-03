@@ -10,10 +10,10 @@ var bcrypt = alchemy.use('bcrypt'),
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.3.0
+ * @version  0.5.0
  */
-var AclStatic = Function.inherits('Alchemy.AppController', function AclStaticController(conduit, options) {
-	AclStaticController.super.call(this, conduit, options);
+var AclStatic = Function.inherits('Alchemy.Controller.App', function AclStatic(conduit, options) {
+	AclStatic.super.call(this, conduit, options);
 });
 
 /**
@@ -21,9 +21,9 @@ var AclStatic = Function.inherits('Alchemy.AppController', function AclStaticCon
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.2.0
+ * @version  0.5.0
  */
-AclStatic.setMethod(function joinForm(conduit) {
+AclStatic.setAction(function joinForm(conduit) {
 	this.render('acl/join');
 });
 
@@ -32,9 +32,9 @@ AclStatic.setMethod(function joinForm(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.2.0
+ * @version  0.5.0
  */
-AclStatic.setMethod(function loginForm(conduit) {
+AclStatic.setAction(function loginForm(conduit) {
 	this.render('acl/login');
 });
 
@@ -43,9 +43,9 @@ AclStatic.setMethod(function loginForm(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.2.0
+ * @version  0.5.0
  */
-AclStatic.setMethod(function loginPost(conduit) {
+AclStatic.setAction(function loginPost(conduit) {
 
 	var that = this,
 	    conditions,
@@ -67,7 +67,7 @@ AclStatic.setMethod(function loginPost(conduit) {
 			return conduit.error(err);
 		}
 
-		if (!record.length) {
+		if (!record) {
 			return conduit.notAuthorized(true);
 		}
 
@@ -95,9 +95,9 @@ AclStatic.setMethod(function loginPost(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.4.0
+ * @version  0.5.0
  */
-AclStatic.setMethod(function logout() {
+AclStatic.setAction(function logout() {
 
 	// Remove the user data from the session
 	this.session('afterLogin', null);

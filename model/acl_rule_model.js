@@ -8,10 +8,10 @@ var acl_rule_types = alchemy.getClassGroup('acl_rule_types'),
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  0.3.0
+ * @version  0.5.0
  */
-var AclRule = Model.extend(function AclRuleModel(options) {
-	AclRuleModel.super.call(this, options);
+var AclRule = Function.inherits('Alchemy.Model', function AclRule(options) {
+	AclRule.super.call(this, options);
 });
 
 /**
@@ -166,7 +166,7 @@ AclRule.setMethod(function getUserRules(user, callback) {
 				return done(null, []);
 			}
 
-			done(null, documents.toArray());
+			done(null, documents);
 		});
 	});
 

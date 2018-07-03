@@ -146,7 +146,7 @@ var viewSettings = {
  *
  * @author        Jelle De Loecker   <jelle@kipdola.be>
  * @since         0.2.0
- * @version       0.4.0
+ * @version       0.5.0
  */
 Router.use(function persistentLoginCheck(req, res, next) {
 
@@ -166,16 +166,21 @@ Router.use(function persistentLoginCheck(req, res, next) {
 		Persistent = conduit.getModel('AclPersistentCookie');
 
 		Persistent.find('first', {conditions: {identifier: acpl.i, token: acpl.t}}, function gotCookie(err, cookie) {
-			if (!err && cookie.length && cookie[0].User) {
-				conduit.getModel('User').find('first', {conditions: {_id: cookie[0].User._id}}, function gotUser(err, user) {
+
+			if (!err && cookie && cookie.User) {
+				conduit.getModel('User').find('first', {conditions: {_id: cookie.User._id}}, function gotUser(err, user) {
 
 					if (err) {
 						return next();
 					}
 
 					// Only set the user data if a user was actually found
-					if (user.length) {
+					if (user) {
 						conduit.session('UserData', user);
+
+						if (typeof user.onAcplLogin == 'function') {
+							user.onAcplLogin(conduit);
+						}
 					}
 
 					next();

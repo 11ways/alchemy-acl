@@ -5,10 +5,10 @@
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  0.3.0
+ * @version  0.5.0
  */
-var Group = Model.extend(function AclGroupModel(options) {
-	AclGroupModel.super.call(this, options);
+var Group = Function.inherits('Alchemy.Model', function AclGroup(options) {
+	AclGroup.super.call(this, options);
 });
 
 /**

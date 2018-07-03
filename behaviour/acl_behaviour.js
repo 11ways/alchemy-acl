@@ -12,9 +12,8 @@ var dataTypes = alchemy.shared('Acl.dataTypes'),
  * @since         0.0.1
  * @version       0.2.0
  */
-var Acl = Function.inherits('Behaviour', function AclBehaviour(model, options) {
-
-	Behaviour.call(model, options);
+var Acl = Function.inherits('Alchemy.Behaviour', function Acl(model, options) {
+	Acl.super.call(model, options);
 });
 
 Acl.setProperty('dataTypes', dataTypes);
