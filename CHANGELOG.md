@@ -1,3 +1,7 @@
+# 0.5.1 (2018-07-04)
+
+* Use `alchemy.getCache()` instead of `expirable` module
+
 # 0.5.0 (2018-07-04)
 
 * Make compatible with alchemy v1.0.0

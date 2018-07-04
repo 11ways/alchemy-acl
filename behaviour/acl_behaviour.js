@@ -1,6 +1,5 @@
 var dataTypes = alchemy.shared('Acl.dataTypes'),
-    expirable = alchemy.use('expirable'),
-    cache     = new expirable('15 minutes');
+    cache     = alchemy.getCache('acl', '15 minutes');
 
 /**
  * The ACL Behaviour class
@@ -23,7 +22,7 @@ Acl.setProperty('dataTypes', dataTypes);
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  0.1.0
+ * @version  0.5.1
  */
 Acl.setMethod(function getTypesToApply(callback) {
 
@@ -48,7 +47,7 @@ Acl.setMethod(function getTypesToApply(callback) {
 	}
 
 	// Get the types from the cache
-	result = cache.get(cacheId, true);
+	result = cache.peek(cacheId);
 
 	if (!result) {
 
@@ -58,7 +57,7 @@ Acl.setMethod(function getTypesToApply(callback) {
 
 		// Tell it to store it in cache later
 		doCache = true;
-		
+
 		result = [];
 
 		for (i = 0; i < ruleTypes.length; i++) {
