@@ -124,7 +124,7 @@ alchemy.sputnik.before('startServer', function beforeStartServer(done) {
 		_id: SuperUserId,
 		username: 'admin',
 		name: 'Superuser',
-		password: '$2a$10$sTLrARZ6hEJwnof6f6ZLDO2L.i.oumyWFC2jC4FB2k3fdkfszYzZC', // "admin"
+		password: 'admin', // "admin"
 		acl_group_id: [SuperUserGroupId]
 	});
 });
