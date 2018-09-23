@@ -34,8 +34,6 @@ var User = Function.inherits('Alchemy.Model', function User(options) {
 				return next(err);
 			}
 
-			pr('Hash: ' + hash);
-
 			data.password = hash;
 			next();
 		});
