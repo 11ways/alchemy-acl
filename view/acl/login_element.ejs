@@ -2,20 +2,23 @@
 	<p><%= authError %></p>
 <% } %>
 <div class="form-container">
-	<img src="/public/logo.png" class="logo" alt="Logo" />
+	<img src="/public/logo.png" class="logo" alt="Logo Chimera" />
 	<form action="/login<% if (is_modal) print('?h_diversion=modal') %>" method="POST">
+		<h1>Welcome to Chimera! 👋</h1>
 		<div class="user">
-			<input type="text" name="username" placeholder="login" tabindex="1">
+			<label for="username">Username</label>
+			<input autofocus type="text" name="username" id="username">
 		</div>
 		<div class="password">
-			<input type="password" name="password" placeholder="password" tabindex="2" autocorrect="off" required>
+			<label for="password">Password</label>
+			<input type="password" name="password" id="password" autocorrect="off" required>
 		</div>
 		<div class="remember">
 			<label>
-				<input type="checkbox" name="remember" tabindex="3">
-				<%= __('Remember me') %>
+				<input checked type="checkbox" name="remember">
+				<span><%= __('Remember me for the next 30 days') %></span>
 			</label>
 		</div>
-		<input type="submit" class="btn-top" value="Login">
+		<input type="submit" class="btn-top" value="Log in">
 	</form>
 </div>

@@ -7,6 +7,7 @@
 html{
 	font-size: 14px;
 	box-sizing: border-box;
+	background: hsl(210, 10%, 16%);
 }
 
 *, *:before, *:after {
@@ -26,90 +27,66 @@ body {
 }
 
 form {
-	padding: 3.2rem;
-	background: @gray-light;
-	width: 25rem;
+	h1 {
+		font-size: 3.5em;
+		color: #aaa;
+		margin-top: 0;
+		margin-bottom: 2.5rem;
+	}
+	padding: 3rem;
+	border-radius: 4px;
+	border: 1px solid hsl(208, 11%, 35%);
+	background: hsl(208, 11%, 23%);
+	box-shadow: 0 0 50px rgba(0,0,0,.075);
+	width: 40rem;
 	position: relative;
-	margin-top: 1.43rem;
 	margin-left: auto;
 	margin-right: auto;
 	font-family: @lato;
-
-	&:before{
-		position: absolute;
-		top:-20px;
-		left: 50%;
-		width: 0px;
-		height: 0px;
-		border-bottom: 20px solid @gray-light;
-		border-left: 20px solid transparent;
-		border-right: 20px solid transparent;
-		content: " ";
-		text-indent: -9999px;
-		color: transparent;
-		margin-left: -20px;
+	
+	label {
+		display: block;
+		color: #eee;
+		padding: 0 0 .35rem 0;
+		font-size: 1.2rem;
+		text-align: left;
 	}
+
 	input{
+		background: hsl(210, 11%, 21%);
+		border: 1px solid hsl(210, 11%, 35%);
+		border-radius: 3px;
 		display: block;
 		width: 100%;
 		height: 50px;
-		margin-bottom: 10px;
-		padding: 0px 20px 0px 50px;
-		border: none;
+		margin-bottom: 1.5rem;
+		padding: 10px;
 		-webkit-font-smoothing: antialiased;
 		font-family: @lato;
 		color: @gray;
-		font-size: 1.134rem;
+		font-size: 1.2rem;
+		&:focus {
+			box-shadow: 0 0 2px 2px rgba(255,255,255,.5);
+		}
 	}
 
 	input[type="submit"] {
-		padding: 0 20px;
-	}
-
-	div{
-		&.user,
-		&.password{
-			&:before{
-				display: block;
-				content: " ";
-				text-indent: -9999px;
-				color: transparent;
-				position: absolute;
-				z-index: 11;
-			}
+		height: auto;
+		padding: 1rem 1rem;
+		background: hsl(223, 68%, 49%);
+		color: white;
+		font-size: 1.5rem;
+		font-weight: bold;
+		text-transform: uppercase;
+		&:hover, &:focus {
+			background: hsl(223, 68%, 39%);
+			text-decoration: underline;
+			cursor: pointer;
 		}
-		&.user{
-			&:before{
-				width: 25px;
-				height: 27px;
-				background: url('/public/user_icon.png') no-repeat;
-				background: url('/public/user_icon.svg') no-repeat;
-				margin-top: 12px;
-				margin-left: 12px;
-			}
-		}
-		&.password{
-			&:before{
-				width: 25px;
-				height: 13px;
-				background: url('/public/key_icon.png') no-repeat;
-				background: url('/public/key_icon.svg') no-repeat;
-				margin-top: 18px;
-				margin-left: 10px;
-			}
-		}
-		input{
-			position: relative;
-			z-index: 10;
-		}
-	}
-	.btn-top{
-		height: 50px;
 	}
 }
 
 .form-container{
-	text-align: center;
 	padding-top: 85px;
 	img{
 		&.logo{
@@ -128,16 +105,15 @@ form {
 
 .remember {
 	display: flex;
-	align-content: center;
-	justify-content: center;
+	align-content: left;
 	margin: 2rem 0;
-
 	label {
+		span {
+			color: #aaa;
+		}
 		display: flex;
-		align-content: center;
-		justify-content: center;
 		font-size: 1.1rem;
-
+		color: white;
 		input,
 		span {
 			flex: 0 0 auto;
