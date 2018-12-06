@@ -54,7 +54,7 @@ User.setProperty('displayField', 'username');
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.2.0
- * @version  0.2.0
+ * @version  0.5.3
  */
 User.constitute(function addFields() {
 
@@ -62,7 +62,7 @@ User.constitute(function addFields() {
 	    i;
 
 	this.addField('username', 'String');
-	this.addField('password', 'Password');
+	this.addField('password', 'Password', {is_private: true});
 
 	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
 		field = alchemy.plugins.acl.userModelFields[i];

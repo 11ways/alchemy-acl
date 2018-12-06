@@ -1,4 +1,11 @@
-## 0.5.2 (WIP)
+## 0.5.3 (WIP)
+
+* Set the `is_private` flag on the `User#password` field
+
+## 0.5.2 (2018-10-18)
+
+* Fix setting the default password
+* Remove stray `pr` call
 
 ## 0.5.1 (2018-07-04)
 

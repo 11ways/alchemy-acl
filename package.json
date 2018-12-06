@@ -1,7 +1,7 @@
 {
 	"name": "alchemy-acl",
 	"description": "ACL plugin for Alchemy MVC",
-	"version": "0.5.2-alpha",
+	"version": "0.5.3-alpha",
 	"author": "Jelle De Loecker <jelle@develry.be>",
 	"keywords": [
 		"alchemy",
