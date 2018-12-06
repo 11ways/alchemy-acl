@@ -1,10 +1,12 @@
-<% if (authError) { %>
-	<p><%= authError %></p>
-<% } %>
 <div class="form-container">
 	<img src="/public/logo.png" class="logo" alt="Logo Chimera" />
 	<form action="/login<% if (is_modal) print('?h_diversion=modal') %>" method="POST">
 		<h1>Welcome to Chimera! 👋</h1>
+
+		<% if (authError) { %>
+			<p class="auth-error"><%= authError %></p>
+		<% } %>
+
 		<div class="user">
 			<label for="username">Username</label>
 			<input autofocus type="text" name="username" id="username">

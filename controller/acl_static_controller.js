@@ -17,6 +17,28 @@ var AclStatic = Function.inherits('Alchemy.Controller.App', function AclStatic(c
 });
 
 /**
+ * Render given view and add default variables
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.5.3
+ * @version  0.5.3
+ */
+AclStatic.setMethod(function render(status, template) {
+
+	if (!this.set('pagetitle')) {
+		let page_title = alchemy.settings.page_title;
+
+		if (!page_title) {
+			page_title = alchemy.settings.title;
+		}
+
+		this.setTitle('Login | ' + (page_title || 'Alchemy'));
+	}
+
+	return render.super.call(this, status, template);
+});
+
+/**
  * Render the join form (GET-only)
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
@@ -150,13 +172,14 @@ AclStatic.setMethod(function allow(UserData, remember) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.2.0
- * @version  0.4.0
+ * @version  0.5.3
  *
  * @param    {Boolean}   triedAuth   Indicate that this was an auth attempt
  */
 Conduit.setMethod(function notAuthorized(triedAuth) {
 
-	var afterLogin
+	var afterLogin,
+	    template;
 
 	if (triedAuth) {
 		this.set('authError', 'Username/Password are not correct');
@@ -177,9 +200,15 @@ Conduit.setMethod(function notAuthorized(triedAuth) {
 	this.status = 401;
 
 	if (this.ajax) {
-		this.render('acl/login_modal');
+		template = 'acl/login_modal';
 	} else {
-		this.render('acl/login');
+		template = 'acl/login';
+	}
+
+	if (this.controller) {
+		this.controller.render(template);
+	} else {
+		this.render(template);
 	}
 });
 

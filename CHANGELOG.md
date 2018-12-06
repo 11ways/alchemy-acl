@@ -2,6 +2,7 @@
 
 * Redesign login screen
 * Set the `is_private` flag on the `User#password` field
+* Set a default page title on the login screen
 
 ## 0.5.2 (2018-10-18)
 
