@@ -1,5 +1,6 @@
 ## 0.5.3 (WIP)
 
+* Redesign login screen
 * Set the `is_private` flag on the `User#password` field
 
 ## 0.5.2 (2018-10-18)
