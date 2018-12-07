@@ -1,5 +1,7 @@
 ## 0.5.4 (WIP)
 
+* Add `Model#getUserId()` method to get the user id on either client- or server-side
+
 ## 0.5.3 (2018-12-06)
 
 * Redesign login screen
