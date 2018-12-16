@@ -174,14 +174,14 @@ AclStatic.setMethod(function allow(UserData, remember) {
  * @since    0.2.0
  * @version  0.5.3
  *
- * @param    {Boolean}   triedAuth   Indicate that this was an auth attempt
+ * @param    {Boolean}   tried_auth   Indicate that this was an auth attempt
  */
-Conduit.setMethod(function notAuthorized(triedAuth) {
+Conduit.setMethod(function notAuthorized(tried_auth) {
 
 	var afterLogin,
 	    template;
 
-	if (triedAuth) {
+	if (tried_auth) {
 		this.set('authError', 'Username/Password are not correct');
 	} else {
 		// Store the request
