@@ -1,7 +1,7 @@
 {
 	"name": "alchemy-acl",
 	"description": "ACL plugin for Alchemy MVC",
-	"version": "0.5.4",
+	"version": "0.6.0-alpha",
 	"author": "Jelle De Loecker <jelle@develry.be>",
 	"keywords": [
 		"alchemy",
@@ -13,11 +13,12 @@
 		"bcrypt": "~2.0.1"
 	},
 	"peerDependencies": {
-		"alchemymvc": "~1.0.6"
+		"alchemymvc": "~1.1.0"
 	},
 	"repository": "skerit/alchemy-acl",
 	"license": "MIT",
 	"engines": {
 		"node": ">=8.9.0"
-	}
+	},
+	"private": true
 }

@@ -110,23 +110,33 @@ ensureGroups[ensureGroups.length] = {
 /**
  * Ensure the ACL groups and SuperUser exist
  */
-alchemy.sputnik.before('startServer', function beforeStartServer(done) {
+alchemy.sputnik.before('start_server', function beforeStartServer() {
+
+	console.log('Ensuring ACL')
+
 	var AclGroup    = Model.get('AclGroup'),
 	    User        = Model.get('User'),
 	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
-	    SuperUserId      = alchemy.plugins.acl.SuperUserId;
+	    SuperUserId      = alchemy.plugins.acl.SuperUserId,
+	    pledge,
+	    tasks = [];
 
 	// Make sure the required ACL groups exist
-	AclGroup.ensureIds(ensureGroups);
+	pledge = AclGroup.ensureIds(ensureGroups);
+	tasks.push(pledge);
 
 	// Make sure the super user exists
-	User.ensureIds({
+	pledge = User.ensureIds({
 		_id: SuperUserId,
 		username: 'admin',
 		name: 'Superuser',
 		password: 'admin', // "admin"
 		acl_group_id: [SuperUserGroupId]
 	});
+
+	tasks.push(pledge);
+
+	return Function.parallel(tasks);
 });
 
 // Get the view settings
@@ -146,13 +156,11 @@ var viewSettings = {
  *
  * @author        Jelle De Loecker   <jelle@kipdola.be>
  * @since         0.2.0
- * @version       0.5.0
+ * @version       0.6.0
  */
 Router.use(function persistentLoginCheck(req, res, next) {
 
-	var acpl,
-	    conduit = req.conduit,
-	    Persistent;
+	var conduit = req.conduit;
 
 	// Do nothing if userdata is already set
 	if (conduit.getSession(false) && conduit.session('UserData')) {
@@ -160,15 +168,21 @@ Router.use(function persistentLoginCheck(req, res, next) {
 	}
 
 	// Get the persistent cookie
-	acpl = conduit.cookie('acpl');
+	let acpl = conduit.cookie('acpl');
 
 	if (acpl) {
-		Persistent = conduit.getModel('AclPersistentCookie');
+		let Persistent = conduit.getModel('AclPersistentCookie'),
+		    criteria = Persistent.find();
 
-		Persistent.find('first', {conditions: {identifier: acpl.i, token: acpl.t}}, function gotCookie(err, cookie) {
+		criteria.where('identifier').equals(acpl.i);
+		criteria.where('token').equals(acpl.t);
+		criteria.select('User');
+
+		Persistent.find('first', criteria, function gotCookie(err, cookie) {
 
 			if (!err && cookie && cookie.User) {
-				conduit.getModel('User').find('first', {conditions: {_id: cookie.User._id}}, function gotUser(err, user) {
+				// Fetch the user again
+				conduit.getModel('User').findById(cookie.User._id, function gotUser(err, user) {
 
 					if (err) {
 						return next();

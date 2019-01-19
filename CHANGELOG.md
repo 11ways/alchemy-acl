@@ -1,3 +1,7 @@
+## 0.6.0 (WIP)
+
+* Make compatible with Alchemymvc v1.1.0
+
 ## 0.5.4 (2019-01-19)
 
 * Add `Model#getUserId()` method to get the user id on either client- or server-side
