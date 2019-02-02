@@ -1,6 +1,7 @@
 ## 0.6.0 (WIP)
 
 * Make compatible with Alchemymvc v1.1.0
+* Don't re-hash bcrypted passwords
 
 ## 0.5.4 (2019-01-19)
 

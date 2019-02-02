@@ -12,7 +12,7 @@ if (Classes.Alchemy.Model.User || alchemy.plugins.acl.custom_model) {
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  0.5.0
+ * @version  0.6.0
  */
 var User = Function.inherits('Alchemy.Model', function User(options) {
 
@@ -22,7 +22,7 @@ var User = Function.inherits('Alchemy.Model', function User(options) {
 
 		var next;
 
-		if (!data.password) {
+		if (!data.password || data.password.startsWith('$2b$')) {
 			return;
 		}
 
