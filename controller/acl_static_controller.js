@@ -69,21 +69,24 @@ AclStatic.setAction(function loginForm(conduit) {
  */
 AclStatic.setAction(function loginPost(conduit) {
 
-	var that = this,
-	    conditions,
-	    username,
-	    password,
-	    remember;
+	var username,
+	    password;
 
-	username = conduit.body.username;
-	password = conduit.body.password;
-	remember = conduit.body.remember === 'on';
+	username = conduit.body[alchemy.plugins.acl.username];
+	password = conduit.body[alchemy.plugins.acl.password];
 
 	if (!username || !password) {
 		return conduit.notAuthorized();
 	}
 
-	Model.get('User').find('first', {conditions: {username: username}}, function gotUser(err, record) {
+	let that = this,
+	    User = Model.get('User'),
+	    remember = conduit.body.remember === 'on',
+	    crit = User.find();
+
+	crit.where(alchemy.plugins.acl.username).equals(username);
+
+	User.find('first', crit, function gotUser(err, record) {
 
 		if (err != null) {
 			return conduit.error(err);
@@ -93,11 +96,17 @@ AclStatic.setAction(function loginPost(conduit) {
 			return conduit.notAuthorized(true);
 		}
 
-		if (!bcrypt) {
-			return conduit.error(new Error('Password comparison error'));
+		if (alchemy.plugins.acl.password_checker) {
+			alchemy.plugins.acl.password_checker(password, record.password, compared);
+		} else {
+			if (!bcrypt) {
+				return conduit.error(new Error('Password comparison error'));
+			}
+
+			bcrypt.compare(password, record.password, compared);
 		}
 
-		bcrypt.compare(password, record.password, function compared(err, match) {
+		function compared(err, match) {
 
 			if (err != null) {
 				return conduit.error(err);
@@ -108,7 +117,7 @@ AclStatic.setAction(function loginPost(conduit) {
 			} else {
 				conduit.notAuthorized(true);
 			}
-		});
+		}
 	});
 });
 

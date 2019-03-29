@@ -1,15 +1,13 @@
-var Model = Blast.Classes.Hawkejs.Model;
-
 /**
  * Get the current user's id
  *
  * @author   Jelle De Loecker <jelle@develry.be>
- * @since    0.5.4
+ * @since    0.6.0
  * @version  0.6.0
  *
  * @return   {ObjectID|String|undefined}
  */
-Model.setMethod(function getUserId() {
+Classes.Alchemy.Client.Conduit.setMethod(function getUserId() {
 
 	var user_id;
 

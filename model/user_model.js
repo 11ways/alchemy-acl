@@ -1,9 +1,9 @@
-var bcrypt = alchemy.use('bcrypt');
-
 // Don't load this file if a user model already exists
 if (Classes.Alchemy.Model.User || alchemy.plugins.acl.custom_model) {
 	return;
 }
+
+let bcrypt = alchemy.use('bcrypt');
 
 /**
  * The User Model class

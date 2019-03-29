@@ -24,6 +24,9 @@ var options = {
 	// The password field
 	password: 'password',
 
+	// Custom password checked function
+	password_checker: null,
+
 	// The default url to redirect to
 	redirect: '/',
 
@@ -75,69 +78,6 @@ alchemy.plugins.acl = Object.assign(options, alchemy.plugins.acl);
 
 // Make sure the model name is correct
 options.model = options.model.modelName();
-
-// Ensure these groups exist
-var ensureGroups = [];
-
-// The everyone group
-ensureGroups[ensureGroups.length] = {
-	_id: options.EveryoneGroupId,
-	name: 'Everyone',
-	special: true,
-	special_command: 'everyone',
-	forfeit_to_group_id: options.LoggedInGroupId,
-	weight: 1
-};
-
-// The logged in user group
-ensureGroups[ensureGroups.length] = {
-	_id: options.LoggedInGroupId,
-	name: 'Logged in',
-	special: true,
-	special_command: 'loggedin',
-	forfeit_to_group_id: options.SuperUserGroupId,
-	weight: 5
-};
-
-// The super user group
-ensureGroups[ensureGroups.length] = {
-	_id: options.SuperUserGroupId,
-	name: 'Superuser',
-	root: true,
-	weight: 10001
-};
-
-/**
- * Ensure the ACL groups and SuperUser exist
- */
-alchemy.sputnik.before('start_server', function beforeStartServer() {
-
-	console.log('Ensuring ACL')
-
-	var AclGroup    = Model.get('AclGroup'),
-	    User        = Model.get('User'),
-	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
-	    SuperUserId      = alchemy.plugins.acl.SuperUserId,
-	    pledge,
-	    tasks = [];
-
-	// Make sure the required ACL groups exist
-	pledge = AclGroup.ensureIds(ensureGroups);
-	tasks.push(pledge);
-
-	// Make sure the super user exists
-	pledge = User.ensureIds({
-		_id: SuperUserId,
-		username: 'admin',
-		name: 'Superuser',
-		password: 'admin', // "admin"
-		acl_group_id: [SuperUserGroupId]
-	});
-
-	tasks.push(pledge);
-
-	return Function.parallel(tasks);
-});
 
 // Get the view settings
 var viewSettings = {
@@ -220,22 +160,22 @@ Router.use(function rulesCheck(req, res, next) {
 }, {weight: 99800});
 
 // Send the acl layout options to the client
-alchemy.hawkejs.on({type: 'viewrender', status: 'begin', client: false}, function onBegin(viewRender) {
+alchemy.hawkejs.on({type: 'renderer', status: 'begin', client: false}, function onBegin(renderer) {
 	// Expose the viewsettings only once (they don't change)
-	viewRender.expose('acl-view-setting', viewSettings);
+	renderer.expose('acl-view-setting', viewSettings);
 });
 
 // Send the user info to the client
-alchemy.hawkejs.on({type: 'viewrender', status: 'begin'}, function onBegin(viewRender) {
+alchemy.hawkejs.on({type: 'renderer', status: 'begin'}, function onBegin(renderer) {
 
 	var data,
 	    user;
 
-	if (!viewRender.conduit) {
+	if (!renderer.conduit) {
 		return;
 	}
 
-	data = viewRender.conduit.session('UserData');
+	data = renderer.conduit.session('UserData');
 
 	if (data) {
 		data = data.User;
@@ -246,6 +186,73 @@ alchemy.hawkejs.on({type: 'viewrender', status: 'begin'}, function onBegin(viewR
 		user = Object.assign({}, data);
 		delete user.password;
 
-		viewRender.expose('acl-user-data', user);
+		renderer.expose('acl-user-data', user);
 	}
+});
+
+if (options.ensure_group_records === false) {
+	return;
+}
+
+// Ensure these groups exist
+let ensureGroups = [];
+
+// The everyone group
+ensureGroups[ensureGroups.length] = {
+	_id: options.EveryoneGroupId,
+	name: 'Everyone',
+	special: true,
+	special_command: 'everyone',
+	forfeit_to_group_id: options.LoggedInGroupId,
+	weight: 1
+};
+
+// The logged in user group
+ensureGroups[ensureGroups.length] = {
+	_id: options.LoggedInGroupId,
+	name: 'Logged in',
+	special: true,
+	special_command: 'loggedin',
+	forfeit_to_group_id: options.SuperUserGroupId,
+	weight: 5
+};
+
+// The super user group
+ensureGroups[ensureGroups.length] = {
+	_id: options.SuperUserGroupId,
+	name: 'Superuser',
+	root: true,
+	weight: 10001
+};
+
+/**
+ * Ensure the ACL groups and SuperUser exist
+ */
+alchemy.sputnik.before('start_server', function beforeStartServer() {
+
+	console.log('Ensuring ACL')
+
+	var AclGroup    = Model.get('AclGroup'),
+	    User        = Model.get('User'),
+	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
+	    SuperUserId      = alchemy.plugins.acl.SuperUserId,
+	    pledge,
+	    tasks = [];
+
+	// Make sure the required ACL groups exist
+	pledge = AclGroup.ensureIds(ensureGroups);
+	tasks.push(pledge);
+
+	// Make sure the super user exists
+	pledge = User.ensureIds({
+		_id: SuperUserId,
+		username: 'admin',
+		name: 'Superuser',
+		password: 'admin', // "admin"
+		acl_group_id: [SuperUserGroupId]
+	});
+
+	tasks.push(pledge);
+
+	return Function.parallel(tasks);
 });
