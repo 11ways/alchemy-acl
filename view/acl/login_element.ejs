@@ -1,6 +1,10 @@
 <div class="form-container">
 	<img src="/public/logo.png" class="logo" alt="Logo Chimera" />
-	<form action="/login<% if (is_modal) print('?h_diversion=modal') %>" method="POST">
+	<form
+		action="/login"
+		method="POST"
+		data-he-link="false"
+	>
 		<h1>Welcome to Chimera! 👋</h1>
 
 		<% if (authError) { %>
