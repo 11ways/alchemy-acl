@@ -22,7 +22,7 @@ var User = Function.inherits('Alchemy.Model', function User(options) {
 
 		var next;
 
-		if (!data.password || data.password.startsWith('$2b$')) {
+		if (!data.password || (data.password.startsWith('$2b$') || data.password.startsWith('$2a$'))) {
 			return;
 		}
 
