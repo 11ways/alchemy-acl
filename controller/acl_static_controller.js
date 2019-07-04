@@ -220,6 +220,10 @@ Conduit.setMethod(function notAuthorized(tried_auth) {
 		template = 'acl/login';
 	}
 
+	if (tried_auth) {
+		template = 'acl/login';
+	}
+
 	if (this.controller) {
 		this.controller.render(template);
 	} else {
