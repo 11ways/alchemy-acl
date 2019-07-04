@@ -181,7 +181,7 @@ AclStatic.setMethod(function allow(UserData, remember) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.2.0
- * @version  0.5.3
+ * @version  0.6.0
  *
  * @param    {Boolean}   tried_auth   Indicate that this was an auth attempt
  */
@@ -209,8 +209,14 @@ Conduit.setMethod(function notAuthorized(tried_auth) {
 	this.status = 401;
 
 	if (this.ajax) {
-		template = 'acl/login_modal';
-	} else {
+		template = alchemy.plugins.acl.not_authorized_ajax_template;
+	}
+
+	if (!template) {
+		template = alchemy.plugins.acl.not_authorized_template;
+	}
+
+	if (!template) {
 		template = 'acl/login';
 	}
 

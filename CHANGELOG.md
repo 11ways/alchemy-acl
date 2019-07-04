@@ -2,6 +2,7 @@
 
 * Make compatible with Alchemymvc v1.1.0
 * Don't re-hash bcrypted passwords
+* Add `not_authorized_template` and `not_authorized_ajax_template` options
 
 ## 0.5.4 (2019-01-19)
 

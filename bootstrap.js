@@ -51,6 +51,12 @@ var options = {
 	// The name of the content block
 	contentblock: 'acl-content',
 
+	// Template to render when not-authorized
+	not_authorized_template: 'acl/login',
+
+	// Template to render when not-authorized over ajax
+	not_authorized_ajax_template: 'acl/login_modal',
+
 	// Placeholder variables to use in certain strings
 	placeholders: {},
 
