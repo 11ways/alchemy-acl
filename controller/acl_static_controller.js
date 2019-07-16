@@ -57,6 +57,13 @@ AclStatic.setAction(function joinForm(conduit) {
  * @version  0.5.0
  */
 AclStatic.setAction(function loginForm(conduit) {
+
+	let u = conduit.param('u');
+
+	if (u) {
+		this.set('u', u);
+	}
+
 	this.render('acl/login');
 });
 
