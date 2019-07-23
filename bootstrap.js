@@ -127,6 +127,7 @@ Router.use(function persistentLoginCheck(req, res, next) {
 		Persistent.find('first', criteria, function gotCookie(err, cookie) {
 
 			if (!err && cookie && cookie.User) {
+
 				// Fetch the user again
 				conduit.getModel('User').findById(cookie.User._id, function gotUser(err, user) {
 

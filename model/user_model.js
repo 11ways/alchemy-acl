@@ -162,9 +162,9 @@ User.setDocumentMethod(function createPersistentCookie(existing, callback) {
 		}
 
 		data = {
-			identifier: result[0],
-			token: result[1],
-			user_id: that._id
+			identifier : result[0],
+			token      : result[1],
+			user_id    : that.$pk
 		};
 
 		Persistent.save(data, function saved(err) {
