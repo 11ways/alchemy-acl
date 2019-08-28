@@ -133,13 +133,22 @@ AclStatic.setAction(function loginPost(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.5.0
+ * @version  0.6.0
  */
 AclStatic.setAction(function logout() {
 
-	// Remove the user data from the session
-	this.session('afterLogin', null);
-	this.session('UserData', null);
+	if (alchemy.plugins.acl.destroy_session_on_logout) {
+		let session = this.conduit.getSession(false);
+
+		if (session) {
+			session.destroy();
+		}
+	} else {
+		// Remove the user data from the session
+		this.session('afterLogin', null);
+		this.session('UserData', null);
+	}
+
 	this.cookie('acpl', null);
 
 	this.conduit.expose('acl-user-data', null);

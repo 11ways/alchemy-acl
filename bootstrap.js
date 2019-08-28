@@ -76,7 +76,10 @@ var options = {
 	SuperUserGroupId: alchemy.ObjectId('52efff0000a1c00001000001'),
 
 	// The super user id
-	SuperUserId: alchemy.ObjectId('52efff0000a1c00000000000')
+	SuperUserId: alchemy.ObjectId('52efff0000a1c00000000000'),
+
+	// Destroy session on log out
+	destroy_session_on_logout : true,
 };
 
 // Inject the user-overridden options
