@@ -132,7 +132,7 @@ Router.use(function persistentLoginCheck(req, res, next) {
 			if (!err && cookie && cookie.User) {
 
 				// Fetch the user again
-				conduit.getModel('User').findById(cookie.User._id, function gotUser(err, user) {
+				conduit.getModel('User').findById(cookie.User.$pk, function gotUser(err, user) {
 
 					if (err) {
 						return next();
@@ -154,7 +154,25 @@ Router.use(function persistentLoginCheck(req, res, next) {
 			}
 		});
 	} else {
-		next();
+		if (alchemy.settings.environment != 'live' && alchemy.settings.force_user_login) {
+			conduit.getModel('User').findById(alchemy.settings.force_user_login, function gotUser(err, user) {
+
+				if (err) {
+					console.log('Failed to login test user');
+					return next();
+				}
+
+				if (!user) {
+					console.log('Could not find test user ' + alchemy.settings.force_user_login);
+					return next();
+				}
+
+				conduit.session('UserData', user);
+				next();
+			});
+		} else {
+			next();
+		}
 	}
 }, {weight: 99999});
 
