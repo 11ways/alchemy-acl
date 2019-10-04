@@ -95,7 +95,7 @@ AclRule.constitute(function chimeraConfig() {
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  0.3.0
+ * @version  0.6.0
  *
  * @param    {Object}   user      The user object as it is in the session
  * @param    {Function} callback  The function to pass the rules to
@@ -145,10 +145,13 @@ AclRule.setMethod(function getUserRules(user, callback) {
 
 		condition = {
 			$or: {
-				'target_groups_id': groups,
-				'target_users_id': users
+				'target_groups_id': groups
 			}
 		};
+
+		if (users) {
+			condition.$or.target_users_id = users;
+		}
 
 		options = {
 			conditions : condition,
