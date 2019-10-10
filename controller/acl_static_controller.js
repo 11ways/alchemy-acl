@@ -137,6 +137,8 @@ AclStatic.setAction(function loginPost(conduit) {
  */
 AclStatic.setAction(function logout() {
 
+	var redirect_url;
+
 	if (alchemy.plugins.acl.destroy_session_on_logout) {
 		let session = this.conduit.getSession(false);
 
@@ -153,8 +155,15 @@ AclStatic.setAction(function logout() {
 
 	this.conduit.expose('acl-user-data', null);
 
-	// Redirect to the root
-	this.conduit.redirect('/');
+	// Try getting a url to redirect the user to
+	redirect_url = this.conduit.param('redirect_url') || this.conduit.param('return_url');
+
+	if (!redirect_url || typeof redirect_url != 'string') {
+		redirect_url = '/';
+	}
+
+	// Redirect the user
+	this.conduit.redirect(redirect_url);
 });
 
 /**
