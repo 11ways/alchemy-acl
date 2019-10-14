@@ -137,7 +137,8 @@ AclStatic.setAction(function loginPost(conduit) {
  */
 AclStatic.setAction(function logout() {
 
-	var redirect_url;
+	var redirect_url,
+	    fingerprint = this.conduit.fingerprint;
 
 	if (alchemy.plugins.acl.destroy_session_on_logout) {
 		let session = this.conduit.getSession(false);
@@ -149,6 +150,10 @@ AclStatic.setAction(function logout() {
 		// Remove the user data from the session
 		this.session('afterLogin', null);
 		this.session('UserData', null);
+	}
+
+	if (fingerprint && alchemy.fingerprints) {
+		alchemy.fingerprints.remove(fingerprint);
 	}
 
 	this.cookie('acpl', null);
