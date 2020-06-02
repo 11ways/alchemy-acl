@@ -125,41 +125,34 @@ AclRule.setMethod(function getUserRules(user, callback) {
 	// Make a bottleneck that is asynchronous
 	cached = Function.hinder(true, function getRules(done) {
 
-		var condition,
-		    options,
-		    groups,
-		    users;
+		let criteria = that.find();
+		let or = criteria.or();
+		let users;
 
 		// Always include the 'everyone' group
-		groups = [AclPlugin.EveryoneGroupId];
+		let groups = [AclPlugin.EveryoneGroupId];
 
 		if (user) {
 			// If the user entry exists, include the logged in group
 			groups.push(AclPlugin.LoggedInGroupId);
 
 			// Include the groups this user has been assigned to
-			groups = groups.concat(user.acl_group_id);
+			if (user.acl_group_id) {
+				groups = groups.concat(user.acl_group_id);
+			}
 
 			users = [user._id];
 		}
 
-		condition = {
-			$or: {
-				'target_groups_id': groups
-			}
-		};
+		or.where('target_groups_id').in(groups);
 
 		if (users) {
-			condition.$or.target_users_id = users;
+			or.where('target_users_id').in(users);
 		}
 
-		options = {
-			conditions : condition,
-			recursive  : 0,
-			sort       : {'settings.weight': 'DESC'}
-		};
+		criteria.sort({'settings.weight': 'DESC'});
 
-		that.find('all', options, function gotDocuments(err, documents) {
+		that.find('all', criteria, function gotDocuments(err, documents) {
 
 			if (err) {
 				return done(err);
