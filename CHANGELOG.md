@@ -1,8 +1,18 @@
-## 0.6.0 (WIP)
+## 0.6.0 (2020-07-21)
 
 * Make compatible with Alchemymvc v1.1.0
 * Don't re-hash bcrypted passwords
 * Add `not_authorized_template` and `not_authorized_ajax_template` options
+* Use regular acl/login template when auth attempt failed
+* Pass `u` get parameter to join template
+* Use $pk instead of _id
+* Destroy session on logout
+* Allow forcing user login during development with the `force_user_login` setting
+* Don't query for `undefined` values, it doesn't work the same on all datasources
+* Allow setting a redirect_url parameter to the logout route
+* Remove fingerprint when logging out
+* Upgrade bcrypt dependency to 4.0.1
+* 
 
 ## 0.5.4 (2019-01-19)
 
