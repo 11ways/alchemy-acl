@@ -7,7 +7,7 @@ Router.post('JoinPost', '/join', 'AclStatic#joinPost');
 Router.get('Logout', '/logout', 'AclStatic#logout');
 
 // Add models to the menu deck
-if (alchemy.plugins.chimera) {
+if (alchemy.plugins.chimera && alchemy.plugins.chimera.menu) {
 	alchemy.plugins.chimera.menu.set('acl_group', {
 		name : 'acl_groups',
 		title: 'ACL Groups',

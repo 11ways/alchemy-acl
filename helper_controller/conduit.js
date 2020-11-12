@@ -3,11 +3,11 @@
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.6.0
- * @version  0.6.0
+ * @version  0.7.0
  *
  * @return   {ObjectID|String|undefined}
  */
-Classes.Alchemy.Client.Conduit.setMethod(function getUserId() {
+Classes.Alchemy.Client.Conduit.Conduit.setMethod(function getUserId() {
 
 	var user_id;
 

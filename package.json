@@ -1,7 +1,7 @@
 {
 	"name": "alchemy-acl",
 	"description": "ACL plugin for Alchemy MVC",
-	"version": "0.6.0",
+	"version": "0.7.0-alpha",
 	"author": "Jelle De Loecker <jelle@elevenways.be>",
 	"keywords": [
 		"alchemy",
@@ -19,5 +19,6 @@
 	"license": "MIT",
 	"engines": {
 		"node": ">=12.15.0"
-	}
+	},
+	"private": true
 }
