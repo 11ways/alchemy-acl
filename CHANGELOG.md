@@ -1,3 +1,7 @@
+## 0.7.1 (WIP)
+
+* Fix `Conduit` methods not being set properly
+
 ## 0.7.0 (2020-12-10)
 
 * Implement alchemy v1.1.3 fixes

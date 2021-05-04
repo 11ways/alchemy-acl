@@ -1,6 +1,6 @@
 var bcrypt = alchemy.use('bcrypt'),
     AclPlugin = alchemy.plugins.acl,
-    Conduit = Classes.Alchemy.Conduit;
+    Conduit = Classes.Alchemy.Conduit.Conduit;
 
 /**
  * The ACL Static Controller
