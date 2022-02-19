@@ -228,7 +228,9 @@ let ensureGroups = [];
 // The everyone group
 ensureGroups[ensureGroups.length] = {
 	_id: options.EveryoneGroupId,
-	name: 'Everyone',
+	title: 'Everyone',
+	name: 'everyone',
+	description: 'Meta group: targets everyone',
 	special: true,
 	special_command: 'everyone',
 	forfeit_to_group_id: options.LoggedInGroupId,
@@ -238,7 +240,9 @@ ensureGroups[ensureGroups.length] = {
 // The logged in user group
 ensureGroups[ensureGroups.length] = {
 	_id: options.LoggedInGroupId,
-	name: 'Logged in',
+	title: 'Logged In',
+	name: 'logged_in',
+	description: 'Meta group: targets logged in users',
 	special: true,
 	special_command: 'loggedin',
 	forfeit_to_group_id: options.SuperUserGroupId,
@@ -248,7 +252,9 @@ ensureGroups[ensureGroups.length] = {
 // The super user group
 ensureGroups[ensureGroups.length] = {
 	_id: options.SuperUserGroupId,
-	name: 'Superuser',
+	title: 'Superuser',
+	name: 'superuser',
+	description: 'Users that have access to everything',
 	root: true,
 	weight: 10001
 };
