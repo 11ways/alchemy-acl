@@ -12,33 +12,9 @@ let bcrypt = alchemy.use('bcrypt');
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.0.1
- * @version  0.6.0
+ * @version  0.7.2
  */
-var User = Function.inherits('Alchemy.Model', function User(options) {
-
-	User.super.call(this, options);
-
-	this.on('saving', function beforeSave(data, options, creating) {
-
-		var next;
-
-		if (!data.password || (data.password.startsWith('$2b$') || data.password.startsWith('$2a$'))) {
-			return;
-		}
-
-		next = this.wait();
-
-		bcrypt.hash(data.password, 8, function gotHash(err, hash) {
-
-			if (err != null) {
-				return next(err);
-			}
-
-			data.password = hash;
-			next();
-		});
-	});
-});
+var User = Function.inherits('Alchemy.Model', 'User');
 
 /**
  * The default field to display is the 'username' one
@@ -54,7 +30,7 @@ User.setProperty('displayField', 'username');
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.2.0
- * @version  0.5.3
+ * @version  0.7.2
  */
 User.constitute(function addFields() {
 
@@ -64,6 +40,9 @@ User.constitute(function addFields() {
 	this.addField('username', 'String');
 	this.addField('password', 'Password', {is_private: true});
 
+	// If the user is still enabled
+	this.addField('enabled', 'Boolean', {default: true});
+
 	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
 		field = alchemy.plugins.acl.userModelFields[i];
 
@@ -71,6 +50,10 @@ User.constitute(function addFields() {
 	}
 
 	this.hasAndBelongsToMany('AclGroup');
+
+	if (typeof alchemy.plugins.acl.addFields == 'function') {
+		alchemy.plugins.acl.addFields.call(this);
+	}
 });
 
 /**
@@ -78,7 +61,7 @@ User.constitute(function addFields() {
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.2.0
- * @version  0.2.0
+ * @version  0.7.2
  */
 User.constitute(function chimeraConfig() {
 
@@ -97,12 +80,14 @@ User.constitute(function chimeraConfig() {
 	list = this.chimera.getActionFields('list');
 
 	list.addField('username');
+	list.addField('enabled');
 
 	// Get the edit group
 	edit = this.chimera.getActionFields('edit');
 
 	edit.addField('username');
 	edit.addField('password');
+	edit.addField('enabled');
 	edit.addField('acl_group_id');
 
 	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
@@ -125,6 +110,30 @@ User.constitute(function chimeraConfig() {
 
 	peek.addField('username');
 	peek.addField('acl_group_id');
+
+	if (typeof alchemy.plugins.acl.chimeraConfig == 'function') {
+		alchemy.plugins.acl.chimeraConfig.call(this, list, edit);
+	}
+});
+
+/**
+ * Do things before saving
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.7.2
+ * @version  0.7.2
+ *
+ * @param    {Document.User}   document
+ * @param    {Object}          options
+ */
+User.setMethod(async function beforeSave(document, options) {
+
+	if (!document.password || (document.password.startsWith('$2b$') || document.password.startsWith('$2a$'))) {
+		return;
+	}
+
+	let hash = await bcrypt.hash(document.password, 8);
+	document.password = hash;
 });
 
 /**

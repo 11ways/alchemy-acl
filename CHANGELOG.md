@@ -1,5 +1,7 @@
 ## 0.7.2 (WIP)
 
+* Move User's beforeSave logic to a method instead of an event
+
 ## 0.7.1 (2021-09-12)
 
 * Fix `Conduit` methods not being set properly
