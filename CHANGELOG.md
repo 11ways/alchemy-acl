@@ -2,6 +2,7 @@
 
 * Move User's beforeSave logic to a method instead of an event
 * Add title & description field to ACL Group model
+* Move rule types into the Acl namespace
 
 ## 0.7.1 (2021-09-12)
 

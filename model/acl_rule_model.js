@@ -58,7 +58,7 @@ AclRule.constitute(function addFields() {
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.3.0
- * @version  0.4.0
+ * @version  0.7.2
  */
 AclRule.constitute(function chimeraConfig() {
 
@@ -74,6 +74,8 @@ AclRule.constitute(function chimeraConfig() {
 	list = this.chimera.getActionFields('list');
 
 	list.addField('_id');
+	list.addField('TargetGroups.name', {title: 'Target Groups'});
+	list.addField('type');
 
 	// Get the edit group
 	edit = this.chimera.getActionFields('edit');
