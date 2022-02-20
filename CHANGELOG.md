@@ -1,4 +1,4 @@
-## 0.7.2 (WIP)
+## 0.7.2 (2022-02-20)
 
 * Move User's beforeSave logic to a method instead of an event
 * Add title & description field to ACL Group model
