@@ -58,7 +58,7 @@ AclRule.constitute(function addFields() {
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.3.0
- * @version  0.7.2
+ * @version  0.7.3
  */
 AclRule.constitute(function chimeraConfig() {
 
@@ -73,9 +73,13 @@ AclRule.constitute(function chimeraConfig() {
 	// Get the list group
 	list = this.chimera.getActionFields('list');
 
-	list.addField('_id');
-	list.addField('TargetGroups.name', {title: 'Target Groups'});
-	list.addField('type');
+	try {
+		list.addField('_id');
+		list.addField('TargetGroups.name', {title: 'Target Groups'});
+		list.addField('type');
+	} catch (err) {
+		// Ignore
+	}
 
 	// Get the edit group
 	edit = this.chimera.getActionFields('edit');

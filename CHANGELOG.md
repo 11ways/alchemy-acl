@@ -1,3 +1,7 @@
+## 0.7.3 (2022-05-31)
+
+* Fix Chimera error in AclRule model
+
 ## 0.7.2 (2022-02-20)
 
 * Move User's beforeSave logic to a method instead of an event
