@@ -1,3 +1,7 @@
+## 0.7.4 (WIP)
+
+* Fix peerdependency version issue
+
 ## 0.7.3 (2022-05-31)
 
 * Fix Chimera error in AclRule model
