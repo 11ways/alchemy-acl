@@ -1,4 +1,4 @@
-## 0.7.4 (WIP)
+## 0.7.4 (2022-07-06)
 
 * Fix peerdependency version issue
 * Add password field support for the alchemy-form plugin
