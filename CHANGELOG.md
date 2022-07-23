@@ -1,4 +1,4 @@
-## 0.8.0 (WIP)
+## 0.8.0 (2022-07-23)
 
 * Add new Permissions system
 
