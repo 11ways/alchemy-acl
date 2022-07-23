@@ -1,0 +1,20 @@
+<%
+fieldset = [
+	{name: 'permission', type: 'string'},
+	{name: 'value', type: 'boolean'},
+	{name: 'expiry'},
+]
+%>
+<alchemy-table
+	class="pe-table"
+	purpose="edit"
+	mode="inline"
+	#fieldset={% fieldset %}
+>
+	{% if self.assigned_data.value %}
+		<% $0.records = self.assigned_data.value %>
+	{% /if %}
+	<div slot="footer">
+		<button class="btn add-row">{%t "add-entry" name="permission" %}</button>
+	</div>
+</alchemy-table>

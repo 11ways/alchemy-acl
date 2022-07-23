@@ -30,18 +30,21 @@ User.setProperty('displayField', 'username');
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.2.0
- * @version  0.7.2
+ * @version  0.8.0
  */
 User.constitute(function addFields() {
-
-	var field,
-	    i;
 
 	this.addField('username', 'String');
 	this.addField('password', 'Password', {is_private: true});
 
+	// The user's permissions
+	this.addField('permissions', 'Permissions');
+
 	// If the user is still enabled
 	this.addField('enabled', 'Boolean', {default: true});
+
+	let field,
+	    i;
 
 	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
 		field = alchemy.plugins.acl.userModelFields[i];

@@ -1,3 +1,7 @@
+## 0.8.0 (WIP)
+
+* Add new Permissions system
+
 ## 0.7.4 (2022-07-06)
 
 * Fix peerdependency version issue

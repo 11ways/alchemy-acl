@@ -1,3 +1,5 @@
+alchemy.requirePlugin('form');
+
 // Create an acl log function
 log.acl = log.verbose;
 
@@ -277,16 +279,42 @@ alchemy.sputnik.before('start_server', function beforeStartServer() {
 	pledge = AclGroup.ensureIds(ensureGroups);
 	tasks.push(pledge);
 
-	// Make sure the super user exists
-	pledge = User.ensureIds({
-		_id: SuperUserId,
-		username: 'admin',
-		name: 'Superuser',
-		password: 'admin', // "admin"
-		acl_group_id: [SuperUserGroupId]
-	});
-
-	tasks.push(pledge);
-
 	return Function.parallel(tasks);
+});
+
+/**
+ * Load all permissions before starting the server
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.1.0
+ * @version  0.8.0
+ */
+alchemy.sputnik.before('start_server', async function beforeStartServer() {
+
+	const PermissionGroup = Model.get('PermissionGroup'),
+	      User = Model.get('User');
+
+	let superuser_group = await PermissionGroup.findByValues({slug: 'superuser'});
+
+	if (!superuser_group) {
+		superuser_group = PermissionGroup.createDocument();
+		superuser_group.title = 'Superuser';
+		superuser_group.slug = 'superuser';
+		await superuser_group.save();
+	}
+
+	console.log('Loading all permission groups...')
+
+	await PermissionGroup.loadAllGroups();
+
+	let SuperUserId = alchemy.plugins.acl.SuperUserId;
+
+	await User.ensureIds({
+		_id          : SuperUserId,
+		username     : 'admin',
+		name         : 'Superuser',
+		password     : 'admin',
+		permissions  : [{permission: 'group.superuser', value: true}],
+		acl_group_id : [alchemy.plugins.acl.SuperUserGroupId]
+	});
 });
