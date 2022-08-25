@@ -1,4 +1,4 @@
-## 0.8.1 (WIP)
+## 0.8.1 (2022-08-25)
 
 * Don't cast permissions twice
 
