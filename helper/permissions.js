@@ -61,7 +61,7 @@ Permissions.setStatic(function conduitHasPermission(conduit, permission) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.1
  *
  * @return   {Permissions}
  */
@@ -69,6 +69,10 @@ Permissions.setStatic(function cast(value) {
 
 	if (!value || typeof value != 'object') {
 		return;
+	}
+
+	if (value instanceof Permissions) {
+		return value;
 	}
 
 	if (!Array.isArray(value)) {

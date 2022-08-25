@@ -1,4 +1,3 @@
-console.log('Loading Alchemy.Element.Form.PermissionsEditor');
 
 /**
  * The alchemy-permissions-editor element
@@ -8,6 +7,10 @@ console.log('Loading Alchemy.Element.Form.PermissionsEditor');
  * @version  0.8.0
  */
 const PermissionsEditor = Function.inherits('Alchemy.Element.Form.Base', 'PermissionsEditor');
+
+if (!PermissionsEditor.setTemplateFile) {
+	return;
+}
 
 /**
  * The template code

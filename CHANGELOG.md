@@ -1,3 +1,7 @@
+## 0.8.1 (WIP)
+
+* Don't cast permissions twice
+
 ## 0.8.0 (2022-07-23)
 
 * Add new Permissions system
