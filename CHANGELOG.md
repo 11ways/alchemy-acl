@@ -1,4 +1,4 @@
-## 0.8.2 (WIP)
+## 0.8.2 (2022-10-02)
 
 * Add `hasPermission(permission)` method to AclHelper & Permissions class
 
