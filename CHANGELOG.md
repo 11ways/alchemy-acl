@@ -1,3 +1,7 @@
+## 0.8.2 (WIP)
+
+* Add `hasPermission(permission)` method to AclHelper & Permissions class
+
 ## 0.8.1 (2022-08-25)
 
 * Don't cast permissions twice

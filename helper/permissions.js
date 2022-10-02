@@ -467,5 +467,27 @@ Permissions.setMethod(function lookupInheritedPermission(permission) {
 	return null;
 });
 
+/**
+ * Is the given permission available?
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.2
+ * @version  0.8.2
+ *
+ * @param    {String}   permission
+ *
+ * @return   {Boolean}
+ */
+Permissions.setMethod(function hasPermission(permission) {
+
+	let entry = this.lookupPermission(permission);
+
+	if (entry) {
+		return entry.value;
+	}
+
+	return false;
+});
+
 // Make this the persmission checker
 alchemy.setPermissionChecker(Permissions);

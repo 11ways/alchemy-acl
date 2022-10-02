@@ -145,3 +145,30 @@ Acl.setProperty(function handle() {
 		return this.username;
 	}
 });
+
+/**
+ * Does the current logged in user have the given permission?
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.2
+ * @version  0.8.2
+ *
+ * @param    {String}   permission
+ *
+ * @return   {Boolean}
+ */
+Acl.setMethod(function hasPermission(permission) {
+
+	const data = this.data;
+
+	if (data && data.permissions) {
+		try {
+			return data.permissions.hasPermission(permission);
+		} catch (err) {
+			console.error('Failed to lookup permission "' + permission + '"');
+			return false;
+		}
+	}
+
+	return false;
+});
