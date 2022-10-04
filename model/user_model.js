@@ -64,7 +64,7 @@ User.constitute(function addFields() {
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.2.0
- * @version  0.7.2
+ * @version  0.8.3
  */
 User.constitute(function chimeraConfig() {
 
@@ -91,6 +91,7 @@ User.constitute(function chimeraConfig() {
 	edit.addField('username');
 	edit.addField('password');
 	edit.addField('enabled');
+	edit.addField('permissions');
 	edit.addField('acl_group_id');
 
 	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
