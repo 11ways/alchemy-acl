@@ -1,6 +1,7 @@
 ## 0.8.3 (WIP)
 
 * Add permission fields to chimera editor
+* Make sure a user record has a password before trying to compare it
 
 ## 0.8.2 (2022-10-02)
 

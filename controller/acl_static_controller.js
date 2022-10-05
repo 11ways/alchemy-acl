@@ -12,9 +12,7 @@ var bcrypt = alchemy.use('bcrypt'),
  * @since    0.0.1
  * @version  0.5.0
  */
-var AclStatic = Function.inherits('Alchemy.Controller.App', function AclStatic(conduit, options) {
-	AclStatic.super.call(this, conduit, options);
-});
+const AclStatic = Function.inherits('Alchemy.Controller.App', 'AclStatic');
 
 /**
  * Render given view and add default variables
@@ -70,9 +68,9 @@ AclStatic.setAction(function loginForm(conduit) {
 /**
  * Log in the user (POST-only)
  *
- * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.0.1
- * @version  0.5.0
+ * @version  0.8.3
  */
 AclStatic.setAction(function loginPost(conduit) {
 
@@ -101,6 +99,10 @@ AclStatic.setAction(function loginPost(conduit) {
 
 		if (!record) {
 			return conduit.notAuthorized(true);
+		}
+
+		if (!record.password) {
+			return conduit.error(new Error('You can not log in with this user'));
 		}
 
 		if (alchemy.plugins.acl.password_checker) {
