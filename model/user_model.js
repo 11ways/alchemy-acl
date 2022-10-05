@@ -19,11 +19,11 @@ var User = Function.inherits('Alchemy.Model', 'User');
 /**
  * The default field to display is the 'username' one
  *
- * @author   Jelle De Loecker   <jelle@develry.be>
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.2.0
- * @version  0.2.0
+ * @version  0.8.3
  */
-User.setProperty('displayField', 'username');
+User.setProperty('display_field', 'username');
 
 /**
  * Constitute the class wide schema
