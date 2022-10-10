@@ -86,6 +86,10 @@ PermissionsEditor.setMethod(function introduced() {
 
 	let add_button = this.querySelector('.add-row');
 
+	if (!add_button) {
+		return;
+	}
+
 	add_button.addEventListener('click', e => {
 		e.preventDefault();
 		this.table_element.addDataRow();

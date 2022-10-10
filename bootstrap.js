@@ -287,7 +287,7 @@ alchemy.sputnik.before('start_server', function beforeStartServer() {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.1.0
- * @version  0.8.0
+ * @version  0.8.3
  */
 alchemy.sputnik.before('start_server', async function beforeStartServer() {
 
@@ -300,6 +300,7 @@ alchemy.sputnik.before('start_server', async function beforeStartServer() {
 		superuser_group = PermissionGroup.createDocument();
 		superuser_group.title = 'Superuser';
 		superuser_group.slug = 'superuser';
+		superuser_group.permissions = [{permission: '*', value: true}];
 		await superuser_group.save();
 	}
 

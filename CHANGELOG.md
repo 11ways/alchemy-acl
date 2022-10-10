@@ -2,6 +2,7 @@
 
 * Add permission fields to chimera editor
 * Make sure a user record has a password before trying to compare it
+* Fix `Superuser` permission group not having any permissions by default
 
 ## 0.8.2 (2022-10-02)
 
