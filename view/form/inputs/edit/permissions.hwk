@@ -1,6 +1,6 @@
-<alchemy-permissions-editor
+<al-permissions-editor
 	name={% path %}
 	class="alchemy-field-value"
 	#dataprovider={% alchemy_field %}
 	#value={% value %}
-></alchemy-permissions-editor>
+></al-permissions-editor>

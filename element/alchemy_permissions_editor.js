@@ -1,6 +1,6 @@
 
 /**
- * The alchemy-permissions-editor element
+ * The al-permissions-editor element
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
@@ -26,16 +26,16 @@ PermissionsEditor.setTemplateFile('elements/acl/permissions_editor');
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.3
  */
-PermissionsEditor.addElementGetter('table_element', 'alchemy-table.pe-table');
+PermissionsEditor.addElementGetter('table_element', 'al-table.pe-table');
 
 /**
  * Get/set the value
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.3
  */
 PermissionsEditor.setProperty(function value(value) {
 
@@ -46,7 +46,7 @@ PermissionsEditor.setProperty(function value(value) {
 	for (let i = 0; i < rows.length; i++) {
 		row = rows[i];
 
-		let fields = row.queryAllNotNested('alchemy-field'),
+		let fields = row.queryAllNotNested('al-field'),
 		    entry = {};
 
 		for (let i = 0; i < fields.length; i++) {

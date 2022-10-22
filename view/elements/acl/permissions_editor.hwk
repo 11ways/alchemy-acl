@@ -5,7 +5,7 @@ fieldset = [
 	{name: 'expiry'},
 ]
 %>
-<alchemy-table
+<al-table
 	class="pe-table"
 	purpose="edit"
 	mode="inline"
@@ -17,4 +17,4 @@ fieldset = [
 	<div slot="footer">
 		<button class="btn add-row">{%t "add-entry" name="permission" %}</button>
 	</div>
-</alchemy-table>
+</al-table>

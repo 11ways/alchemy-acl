@@ -304,7 +304,7 @@ alchemy.sputnik.before('start_server', async function beforeStartServer() {
 		await superuser_group.save();
 	}
 
-	console.log('Loading all permission groups...')
+	console.log('Loading all permission groups...');
 
 	await PermissionGroup.loadAllGroups();
 
