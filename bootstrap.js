@@ -216,6 +216,10 @@ alchemy.hawkejs.on({type: 'renderer', status: 'begin'}, function onBegin(rendere
 		user = Object.assign({}, data);
 		delete user.password;
 
+		if (user.permissions) {
+			user.permissions = user.permissions.flattened();
+		}
+
 		renderer.expose('acl-user-data', user);
 	}
 });

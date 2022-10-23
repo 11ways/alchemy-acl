@@ -4,6 +4,7 @@
 * Make sure a user record has a password before trying to compare it
 * Fix `Superuser` permission group not having any permissions by default
 * Use `al-` prefix for custom elements
+* Flatten the user's `permissions` property for the client-side
 
 ## 0.8.2 (2022-10-02)
 

@@ -152,24 +152,88 @@ Permissions.setMethod(function toDry() {
 });
 
 /**
+ * Return a flattened version of these permissions
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.8.3
+ * @version  0.8.3
+ *
+ * @return   {Permissions}
+ */
+Permissions.setMethod(function flattened() {
+	let flattened = this.toArray(true);
+	return new Permissions(flattened);
+});
+
+/**
  * Return a simplified array of these permissions
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.3
  *
  * @return   {Array}
  */
-Permissions.setMethod(function toArray() {
+Permissions.setMethod(function toArray(flatten_groups) {
 
 	let result = [];
 
 	_toArray(result, 'group', this.groups);
 	_toArray(result, '', this.nodes);
 
+	if (flatten_groups) {
+		_flattenGroupPermissions.call(this, result);
+	}
+
 	return result;
 });
 
+/**
+ * Flatten group permissions and add them to the array
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.8.0
+ * @version  0.8.3
+ *
+ * @param    {Array}   result
+ *
+ * @return   {Array}
+ */
+function _flattenGroupPermissions(target) {
+
+	let name;
+
+	for (name in this.groups) {
+		let group_permission = this.group_values[name];
+
+		if (!group_permission) {
+			continue;
+		}
+
+		let group = this.getGlobalGroup(name);
+
+		if (!group) {
+			continue;
+		}
+
+		let flattened_group = group.toArray(true);
+
+		for (let entry of flattened_group) {
+			let existing = target.findByPath('permission', entry.permission);
+
+			if (existing) {
+				continue;
+			}
+
+			// Make sure the correct permission levels are taken into account
+			let has_permission = this.hasPermission(entry.permission);
+			
+			if (has_permission) {
+				target.push(entry);
+			}
+		}
+	}
+};
 
 /**
  * Return a simplified array of these permissions
