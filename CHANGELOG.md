@@ -1,4 +1,4 @@
-## 0.8.3 (WIP)
+## 0.8.3 (2022-11-02)
 
 * Add permission fields to chimera editor
 * Make sure a user record has a password before trying to compare it
