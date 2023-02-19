@@ -1,3 +1,7 @@
+## 1.0.0 (WIP)
+
+* Add `Proteus` support
+
 ## 0.8.3 (2022-11-02)
 
 * Add permission fields to chimera editor

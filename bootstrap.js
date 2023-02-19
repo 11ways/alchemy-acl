@@ -16,7 +16,13 @@ if (!global.__) {
 }
 
 // Define the default options
-var options = {
+let options = {
+	// The default authentication system
+	authentication_system: 'simple',
+};
+
+// Define the default options
+var old_options = {
 	// The model to use
 	model: 'User',
 
@@ -26,14 +32,8 @@ var options = {
 	// The password field
 	password: 'password',
 
-	// Custom password checked function
-	password_checker: null,
-
 	// The default url to redirect to
 	redirect: '/',
-
-	// The amount of rounds to process the salt
-	rounds: 10,
 
 	// The name of the base layout
 	baselayout: 'layouts/acl_base',
@@ -62,30 +62,51 @@ var options = {
 	// Placeholder variables to use in certain strings
 	placeholders: {},
 
-	// User model extra fields
-	userModelFields: [
-		['first_name', 'String'],
-		['last_name', 'String']
-	],
-
-	// The everyone group id
-	EveryoneGroupId: alchemy.ObjectId('52efff0000a1c00001000000'),
-
-	// The logged in user group id
-	LoggedInGroupId: alchemy.ObjectId('52efff0000a1c00001000003'),
-
-	// The super user group id
-	SuperUserGroupId: alchemy.ObjectId('52efff0000a1c00001000001'),
-
-	// The super user id
-	SuperUserId: alchemy.ObjectId('52efff0000a1c00000000000'),
-
 	// Destroy session on log out
 	destroy_session_on_logout : true,
+
+	// Use a proteus server?
+	proteus_endpoint : null,
+
+	// The proteus client_id
+	proteus_client_id : null,
+
+	// The proteus client secret
+	proteus_secret : null,
 };
 
 // Inject the user-overridden options
-alchemy.plugins.acl = Object.assign(options, alchemy.plugins.acl);
+alchemy.plugins.acl = options = Object.merge({}, alchemy.plugins.acl, options);
+
+/**
+ * Configure the authentication system before the server starts
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    1.0.0
+ * @version  1.0.0
+ */
+alchemy.sputnik.before('start_server', async function configureAuthenticationSystem() {
+
+	const AuthenticationSystem = Classes.Alchemy.Acl.AuthenticationSystem.AuthenticationSystem.getDescendant(options.authentication_system);
+
+	if (!AuthenticationSystem) {
+		throw new Error('Invalid authentication system, class not found: ' + options.authentication_system);
+	}
+
+	let authentication_config_key = AuthenticationSystem.type_name + '_config';
+	let authentication_configuration = options[authentication_config_key] || {};
+	authentication_configuration = Object.merge({}, AuthenticationSystem.default_configuration, authentication_configuration);
+	options[authentication_config_key] = authentication_configuration;
+
+	const authentication_system = new AuthenticationSystem(authentication_configuration);
+	options.authentication_system = authentication_system;
+
+	await authentication_system.doBootstrap();
+
+});
+
+
+return;
 
 // Make sure the model name is correct
 options.model = options.model.modelName();
