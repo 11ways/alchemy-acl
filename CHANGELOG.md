@@ -1,3 +1,7 @@
+## 0.8.4 (WIP)
+
+* Make login form images configurable
+
 ## 0.8.3 (2022-11-02)
 
 * Add permission fields to chimera editor

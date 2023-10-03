@@ -15,8 +15,7 @@ html{
 }
 
 body {
-	background-image: url('/public/background_chimera.png');
-	background-image: url('/public/background_chimera.svg');
+	background-image: var(--acl-background-logo);
 	background-position: right bottom;
 	background-repeat: no-repeat;
 	background-size: 30rem 30rem;
@@ -90,15 +89,12 @@ form {
 	padding-top: 85px;
 	img{
 		&.logo{
-			background-image: url('/public/logo.png');
-			background-image: url('/public/logo.svg');
-			background-size: contain;
-			background-repeat: no-repeat;
 			margin-bottom: 50px;
 			margin-left: auto;
 			margin-right: auto;
 			content: '';
 			display: block;
+			width: 20rem;
 		}
 	}
 }

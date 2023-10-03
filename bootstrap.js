@@ -59,6 +59,12 @@ var options = {
 	// Template to render when not-authorized over ajax
 	not_authorized_ajax_template: 'acl/login_modal',
 
+	// The logo to use on the login form
+	login_logo: '/public/acl_login_logo.svg',
+
+	// The background logo to use on the login form
+	login_background_logo: '/public/acl_background_logo.svg',
+
 	// Placeholder variables to use in certain strings
 	placeholders: {},
 
@@ -86,6 +92,9 @@ var options = {
 
 // Inject the user-overridden options
 alchemy.plugins.acl = Object.assign(options, alchemy.plugins.acl);
+
+alchemy.exposeStatic('acl_login_logo', alchemy.plugins.acl.login_logo);
+alchemy.exposeStatic('acl_background_logo', alchemy.plugins.acl.login_background_logo);
 
 // Make sure the model name is correct
 options.model = options.model.modelName();
