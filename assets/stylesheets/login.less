@@ -4,6 +4,12 @@
 @gray: rgb(174, 174, 174);
 @lato: 'Lato', sans-serif;
 
+:root {
+	--button-background-color: #5865f2;
+	--button-border-color: #5865f2;
+	--button-text-color: white;
+}
+
 html{
 	font-size: 14px;
 	box-sizing: border-box;
@@ -25,13 +31,14 @@ body {
 	font-size: 0.63rem;
 }
 
-form {
+.acl-login-form {
 	h1 {
 		font-size: 3.5em;
 		color: #aaa;
 		margin-top: 0;
 		margin-bottom: 2.5rem;
 	}
+
 	padding: 3rem;
 	border-radius: 4px;
 	border: 1px solid hsl(208, 11%, 35%);
@@ -42,6 +49,10 @@ form {
 	margin-left: auto;
 	margin-right: auto;
 	font-family: @lato;
+
+	display: flex;
+	flex-flow: column;
+	align-items: center;
 	
 	label {
 		display: block;
@@ -83,9 +94,15 @@ form {
 			cursor: pointer;
 		}
 	}
+
+	.acl-authenticators {
+		display: flex;
+		flex-flow: column;
+		gap: 1rem;
+	}
 }
 
-.form-container{
+.acl-login-form-container {
 	padding-top: 85px;
 	img{
 		&.logo{
@@ -133,4 +150,44 @@ form {
 	text-align: center;
 	font-size: 1.2rem;
 	color: orange;
+}
+
+a.acl-authenticator-button {
+	display: inline-flex;
+	text-shadow: none;
+	justify-content: center;
+	align-items: center;
+	text-decoration: none;
+	font-size: 1.5rem;
+}
+
+.acl-authenticator-button {
+	color: var(--button-text-color, #000000);
+
+	&:hover {
+		color: var(--button-text-color, #000000);
+	}
+
+	display: inline-block;
+	font-family: Whitney, "Open Sans", Helvetica, sans-serif;
+	font-weight: 400;
+	font-size: 11pt;
+	border-radius: 3px;
+	cursor: pointer;
+	height: 45px;
+	width: 250px;
+	box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
+	border-width: 2px;
+	border-style: solid;;
+
+	background-color: var(--button-background-color, #fff);
+	border-color: var(--button-border-color, #fff);
+
+	&:hover {
+		transform: translateY(1px);
+	}
+
+	&:active {
+		transform: translateY(2px);
+	}
 }

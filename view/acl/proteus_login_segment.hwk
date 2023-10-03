@@ -1,0 +1,20 @@
+<div class="acl-login-form">
+	<h1>{%t "acl-login-form-title" %}</h1>
+
+	{% if authError %}
+		<p class="auth-error">{{ authError }}</p>
+	{% /if %}
+
+	<div class="acl-authenticators">
+		{% each authenticators as entry %}
+			<a
+				!Route="AclStatic#proteusRealmLogin"
+				+authenticator={% entry.slug %}
+				class="acl-authenticator-button"
+				style={% entry.style %}
+			>
+				{{ entry.call_to_action or entry.title or entry.slug }}
+			</a>
+		{% /each %}
+	</div>
+</div>

@@ -6,6 +6,27 @@ Router.post('JoinPost', '/join', 'AclStatic#joinPost');
 
 Router.get('Logout', '/logout', 'AclStatic#logout');
 
+Router.add({
+	name       : 'AclStatic#proteusLogin',
+	methods    : 'get',
+	paths      : '/segments/acl/proteus-login',
+	visible_location: false,
+});
+
+Router.add({
+	name       : 'AclStatic#proteusRealmLogin',
+	methods    : 'get',
+	paths      : '/acl/proteus/login/{authenticator}',
+	visible_location: false,
+});
+
+Router.add({
+	name       : 'AclStatic#proteusVerifyLogin',
+	methods    : 'get',
+	paths      : '/acl/proteus/verify',
+	visible_location: false,
+});
+
 // Add models to the menu deck
 if (alchemy.plugins.chimera && alchemy.plugins.chimera.menu) {
 	alchemy.plugins.chimera.menu.set('acl_group', {

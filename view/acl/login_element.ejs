@@ -1,30 +1,52 @@
-<div class="form-container">
-	<img src="/public/logo.png" class="logo" alt="Logo Chimera" />
-	<form
-		action="/login"
-		method="POST"
-		data-he-link="false"
-	>
-		<h1>Welcome to Chimera! 👋</h1>
+<div class="form-container acl-login-form-container">
 
-		<% if (authError) { %>
-			<p class="auth-error"><%= authError %></p>
-		<% } %>
+	{% if expose('acl_login_logo') %}
+		<img
+			!Media={% expose('acl_login_logo') %}
+			class="logo acl-login-logo"
+			alt="Logo"
+		>
+	{% /if %}
 
-		<div class="user">
-			<label for="username">Username</label>
-			<input autofocus type="text" name="username" id="username">
-		</div>
-		<div class="password">
-			<label for="password">Password</label>
-			<input type="password" name="password" id="password" autocorrect="off" required>
-		</div>
-		<div class="remember">
-			<label>
-				<input checked type="checkbox" name="remember">
-				<span><%= __('Remember me for the next 30 days') %></span>
-			</label>
-		</div>
-		<input type="submit" class="btn-top" value="Log in">
-	</form>
+	{% if expose('acl_background_logo') %}
+		<style>
+			:root {
+				--acl-background-logo: url('{{ expose('acl_background_logo') }}');
+			}
+		</style>
+	{% /if %}
+
+	{% if expose('acl_proteus_server') %}
+		<% Alchemy.segment('AclStatic#proteusLogin') %>
+	{% else %}
+
+		<form
+			action="/login"
+			method="POST"
+			data-he-link="false"
+			class="acl-login-form"
+		>
+			<h1>{%t "acl-login-form-title" %}</h1>
+
+			{% if authError %}
+				<p class="auth-error">{{ authError }}</p>
+			{% /if %}
+
+			<div class="user">
+				<label for="username">Username</label>
+				<input autofocus type="text" name="username" id="username">
+			</div>
+			<div class="password">
+				<label for="password">Password</label>
+				<input type="password" name="password" id="password" autocorrect="off" required>
+			</div>
+			<div class="remember">
+				<label>
+					<input checked type="checkbox" name="remember">
+					<span><%= __('Remember me for the next 30 days') %></span>
+				</label>
+			</div>
+			<input type="submit" class="btn-top" value="Log in">
+		</form>
+	{% /if %}
 </div>

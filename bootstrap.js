@@ -88,10 +88,22 @@ var options = {
 
 	// Destroy session on log out
 	destroy_session_on_logout : true,
+
+	// Proteus login server
+	proteus_server : null,
+
+	// Proteus access key
+	proteus_access_key : null,
 };
 
 // Inject the user-overridden options
 alchemy.plugins.acl = Object.assign(options, alchemy.plugins.acl);
+
+if (alchemy.plugins.acl.proteus_server) {
+	// Expose the proteus server endpoint
+	alchemy.exposeStatic('acl_proteus_server', alchemy.plugins.acl.proteus_server);
+	alchemy.plugins.acl.has_proteus = true;
+}
 
 alchemy.exposeStatic('acl_login_logo', alchemy.plugins.acl.login_logo);
 alchemy.exposeStatic('acl_background_logo', alchemy.plugins.acl.login_background_logo);
@@ -114,9 +126,9 @@ var viewSettings = {
 /**
  * Look for persistent login cookies
  *
- * @author        Jelle De Loecker   <jelle@kipdola.be>
+ * @author        Jelle De Loecker   <jelle@elevenways.be>
  * @since         0.2.0
- * @version       0.6.0
+ * @version       0.8.4
  */
 Router.use(function persistentLoginCheck(req, res, next) {
 
@@ -131,38 +143,21 @@ Router.use(function persistentLoginCheck(req, res, next) {
 	let acpl = conduit.cookie('acpl');
 
 	if (acpl) {
-		let Persistent = conduit.getModel('AclPersistentCookie'),
-		    criteria = Persistent.find();
+		let Persistent = conduit.getModel('AclPersistentCookie');
 
-		criteria.where('identifier').equals(acpl.i);
-		criteria.where('token').equals(acpl.t);
-		criteria.select('User');
+		Pledge.done(Persistent.getUserFromCookieForLogin(conduit, acpl), (err, user) => {
 
-		Persistent.find('first', criteria, function gotCookie(err, cookie) {
-
-			if (!err && cookie && cookie.User) {
-
-				// Fetch the user again
-				conduit.getModel('User').findById(cookie.User.$pk, function gotUser(err, user) {
-
-					if (err) {
-						return next();
-					}
-
-					// Only set the user data if a user was actually found
-					if (user) {
-						conduit.session('UserData', user);
-
-						if (typeof user.onAcplLogin == 'function') {
-							user.onAcplLogin(conduit);
-						}
-					}
-
-					next();
-				});
-			} else {
-				next();
+			if (err || !user) {
+				return next();
 			}
+
+			conduit.session('UserData', user);
+
+			if (typeof user.onAcplLogin == 'function') {
+				user.onAcplLogin(conduit);
+			}
+
+			next();
 		});
 	} else {
 		if (alchemy.settings.environment != 'live' && alchemy.settings.force_user_login) {
@@ -237,63 +232,66 @@ if (options.ensure_group_records === false) {
 	return;
 }
 
-// Ensure these groups exist
-let ensureGroups = [];
+if (!alchemy.plugins.acl.has_proteus) {
 
-// The everyone group
-ensureGroups[ensureGroups.length] = {
-	_id: options.EveryoneGroupId,
-	title: 'Everyone',
-	name: 'everyone',
-	description: 'Meta group: targets everyone',
-	special: true,
-	special_command: 'everyone',
-	forfeit_to_group_id: options.LoggedInGroupId,
-	weight: 1
-};
+	// Ensure these groups exist
+	let ensureGroups = [];
 
-// The logged in user group
-ensureGroups[ensureGroups.length] = {
-	_id: options.LoggedInGroupId,
-	title: 'Logged In',
-	name: 'logged_in',
-	description: 'Meta group: targets logged in users',
-	special: true,
-	special_command: 'loggedin',
-	forfeit_to_group_id: options.SuperUserGroupId,
-	weight: 5
-};
+	// The everyone group
+	ensureGroups[ensureGroups.length] = {
+		_id: options.EveryoneGroupId,
+		title: 'Everyone',
+		name: 'everyone',
+		description: 'Meta group: targets everyone',
+		special: true,
+		special_command: 'everyone',
+		forfeit_to_group_id: options.LoggedInGroupId,
+		weight: 1
+	};
 
-// The super user group
-ensureGroups[ensureGroups.length] = {
-	_id: options.SuperUserGroupId,
-	title: 'Superuser',
-	name: 'superuser',
-	description: 'Users that have access to everything',
-	root: true,
-	weight: 10001
-};
+	// The logged in user group
+	ensureGroups[ensureGroups.length] = {
+		_id: options.LoggedInGroupId,
+		title: 'Logged In',
+		name: 'logged_in',
+		description: 'Meta group: targets logged in users',
+		special: true,
+		special_command: 'loggedin',
+		forfeit_to_group_id: options.SuperUserGroupId,
+		weight: 5
+	};
 
-/**
- * Ensure the ACL groups and SuperUser exist
- */
-alchemy.sputnik.before('start_server', function beforeStartServer() {
+	// The super user group
+	ensureGroups[ensureGroups.length] = {
+		_id: options.SuperUserGroupId,
+		title: 'Superuser',
+		name: 'superuser',
+		description: 'Users that have access to everything',
+		root: true,
+		weight: 10001
+	};
 
-	console.log('Ensuring ACL')
+	/**
+	 * Ensure the ACL groups and SuperUser exist
+	 */
+	alchemy.sputnik.before('start_server', function beforeStartServer() {
 
-	var AclGroup    = Model.get('AclGroup'),
-	    User        = Model.get('User'),
-	    SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
-	    SuperUserId      = alchemy.plugins.acl.SuperUserId,
-	    pledge,
-	    tasks = [];
+		console.log('Ensuring ACL')
 
-	// Make sure the required ACL groups exist
-	pledge = AclGroup.ensureIds(ensureGroups);
-	tasks.push(pledge);
+		var AclGroup    = Model.get('AclGroup'),
+			User        = Model.get('User'),
+			SuperUserGroupId = alchemy.plugins.acl.SuperUserGroupId,
+			SuperUserId      = alchemy.plugins.acl.SuperUserId,
+			pledge,
+			tasks = [];
 
-	return Function.parallel(tasks);
-});
+		// Make sure the required ACL groups exist
+		pledge = AclGroup.ensureIds(ensureGroups);
+		tasks.push(pledge);
+
+		return Function.parallel(tasks);
+	});
+}
 
 /**
  * Load all permissions before starting the server
@@ -321,14 +319,16 @@ alchemy.sputnik.before('start_server', async function beforeStartServer() {
 
 	await PermissionGroup.loadAllGroups();
 
-	let SuperUserId = alchemy.plugins.acl.SuperUserId;
+	if (!alchemy.plugins.acl.has_proteus) {
+		let SuperUserId = alchemy.plugins.acl.SuperUserId;
 
-	await User.ensureIds({
-		_id          : SuperUserId,
-		username     : 'admin',
-		name         : 'Superuser',
-		password     : 'admin',
-		permissions  : [{permission: 'group.superuser', value: true}],
-		acl_group_id : [alchemy.plugins.acl.SuperUserGroupId]
-	});
+		await User.ensureIds({
+			_id          : SuperUserId,
+			username     : 'admin',
+			name         : 'Superuser',
+			password     : 'admin',
+			permissions  : [{permission: 'group.superuser', value: true}],
+			acl_group_id : [alchemy.plugins.acl.SuperUserGroupId]
+		});
+	}
 });

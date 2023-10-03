@@ -15,6 +15,19 @@ var bcrypt = alchemy.use('bcrypt'),
 const AclStatic = Function.inherits('Alchemy.Controller.App', 'AclStatic');
 
 /**
+ * Get the Proteus client instance
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ *
+ * @type     {Alchemy.Acl.Proteus}
+ */
+AclStatic.setProperty(function proteus() {
+	return alchemy.plugins.acl.proteus_client;
+});
+
+/**
  * Render given view and add default variables
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
@@ -34,6 +47,88 @@ AclStatic.setMethod(function render(status, template) {
 	}
 
 	return render.super.call(this, status, template);
+});
+
+/**
+ * Render the proteus login form as a segment
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ */
+AclStatic.setAction(async function proteusLogin(conduit) {
+
+	let authenticators = await this.proteus.getAuthenticators();
+
+	this.set('authenticators', authenticators);
+
+	this.renderSegment('acl/proteus_login_segment');
+});
+
+/**
+ * Handle a proteus realm login request
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ */
+AclStatic.setAction(async function proteusRealmLogin(conduit, authenticator_slug) {
+	return this.proteus.startLogin(conduit, authenticator_slug);
+});
+
+/**
+ * Verify a proteus login
+ *
+ * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ */
+AclStatic.setAction(async function proteusVerifyLogin(conduit) {
+
+	let rlid = conduit.param('rlid');
+
+	if (!rlid) {
+		return conduit.notAuthorized();
+	}
+
+	let login_session = conduit.session('proteusLoginSession');
+
+	if (!login_session) {
+		return conduit.notAuthorized();
+	}
+
+	if (login_session.id != rlid) {
+		return conduit.notAuthorized();
+	}
+
+	let result = await this.proteus.getLoginResult(rlid);
+
+	if (!result?.success || !result?.identity) {
+		return conduit.notAuthorized();
+	}
+
+	let identity = result.identity;
+
+	const User = Model.get('User');
+	let user = await User.findByValues({
+		handle : identity.handle,
+	});
+
+	let has_changes = false;
+
+	if (!user) {
+		user = User.createDocument();
+		has_changes = true;
+
+		// Also try to use the same primary ket as Proteus
+		user._id = identity._id;
+	}
+
+	await this.proteus.updateUserWithProteusInfo(user, result);
+
+	conduit.session('proteusLoginSession', null);
+
+	return this.allow(user, true);
 });
 
 /**
@@ -70,15 +165,17 @@ AclStatic.setAction(function loginForm(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.0.1
- * @version  0.8.3
+ * @version  0.8.4
  */
 AclStatic.setAction(function loginPost(conduit) {
 
-	var username,
-	    password;
+	// Disable simple login when Proteus is enabled
+	if (alchemy.plugins.acl.has_proteus) {
+		return conduit.notAuthorized();
+	}
 
-	username = conduit.body[alchemy.plugins.acl.username];
-	password = conduit.body[alchemy.plugins.acl.password];
+	let username = conduit.body[alchemy.plugins.acl.username];
+	let password = conduit.body[alchemy.plugins.acl.password];
 
 	if (!username || !password) {
 		return conduit.notAuthorized();
@@ -102,7 +199,7 @@ AclStatic.setAction(function loginPost(conduit) {
 		}
 
 		if (!record.password) {
-			return conduit.error(new Error('You can not log in with this user'));
+			return conduit.error(400, new Error('You can not log in with this user'));
 		}
 
 		if (alchemy.plugins.acl.password_checker) {

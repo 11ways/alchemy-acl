@@ -35,13 +35,52 @@ User.setProperty('display_field', 'username');
 User.constitute(function addFields() {
 
 	this.addField('username', 'String');
-	this.addField('password', 'Password', {is_private: true});
+
+	if (alchemy.plugins.acl.has_proteus) {
+
+		this.addField('title', 'String', {
+			description : 'The text that will be used to represent this record',
+		});
+
+		this.addField('proteus_uid', 'BigInt', {
+			description : 'The unique identifier number',
+		});
+	
+		this.addField('proteus_handle', 'String', {
+			description : 'The human-readable representation of the identifier',
+		});
+	
+		this.addField('nickname', 'String', {
+			description : 'A nickname for this user',
+		});
+	
+		this.addField('given_name', 'String', {
+			description : 'The given name of this user',
+		});
+	
+		this.addField('family_name', 'String', {
+			description : 'The family name of this user'
+		});
+
+		this.addIndex('proteus_uid', {
+			unique : true,
+			sparse : true,
+		});
+
+		this.addIndex('proteus_handle', {
+			unique : true,
+			sparse : true,
+		});
+
+	} else {
+		this.addField('password', 'Password', {is_private: true});
+
+		// If the user is still enabled
+		this.addField('enabled', 'Boolean', {default: true});
+	}
 
 	// The user's permissions
 	this.addField('permissions', 'Permissions');
-
-	// If the user is still enabled
-	this.addField('enabled', 'Boolean', {default: true});
 
 	let field,
 	    i;
@@ -68,55 +107,41 @@ User.constitute(function addFields() {
  */
 User.constitute(function chimeraConfig() {
 
-	var field,
-	    list,
-	    edit,
-	    view,
-	    peek,
-	    i;
-
 	if (!this.chimera) {
 		return;
 	}
 
-	// Get the list group
-	list = this.chimera.getActionFields('list');
+	let list = this.chimera.getActionFields('list'),
+	    edit = this.chimera.getActionFields('edit');
 
-	list.addField('username');
-	list.addField('enabled');
+	if (alchemy.plugins.acl.has_proteus) {
+		list.addField('proteus_handle', {readonly: true});
+		list.addField('nickname', {readonly: true});
+		list.addField('given_name', {readonly: true});
+		list.addField('family_name', {readonly: true});
 
-	// Get the edit group
-	edit = this.chimera.getActionFields('edit');
+		edit.addField('proteus_handle', {readonly: true});
+		edit.addField('nickname', {readonly: true});
+		edit.addField('given_name', {readonly: true});
+		edit.addField('family_name', {readonly: true});
+		edit.addField('permissions', {readonly: true});
+	} else {
+		list.addField('username');
+		list.addField('enabled');
 
-	edit.addField('username');
-	edit.addField('password');
-	edit.addField('enabled');
-	edit.addField('permissions');
-	edit.addField('acl_group_id');
+		edit.addField('username');
+		edit.addField('password');
+		edit.addField('enabled');
+		edit.addField('permissions');
+		edit.addField('acl_group_id');
+	}
+
+	let field,
+	    i;
 
 	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
 		field = alchemy.plugins.acl.userModelFields[i];
 		edit.addField(field[0]);
-	}
-
-	// Get the view group
-	view = this.chimera.getActionFields('view');
-
-	view.addField('username');
-
-	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
-		field = alchemy.plugins.acl.userModelFields[i];
-		view.addField(field[0]);
-	}
-
-	// Get the peek group
-	peek = this.chimera.getActionFields('peek');
-
-	peek.addField('username');
-	peek.addField('acl_group_id');
-
-	if (typeof alchemy.plugins.acl.chimeraConfig == 'function') {
-		alchemy.plugins.acl.chimeraConfig.call(this, list, edit);
 	}
 });
 
@@ -152,41 +177,50 @@ User.setMethod(async function beforeSave(document, options) {
  */
 User.setDocumentMethod(function createPersistentCookie(existing, callback) {
 
-	var Persistent,
-	    that = this;
-
 	if (typeof existing == 'function') {
 		callback = existing;
 		existing = null;
 	}
 
-	Persistent = Model.get('AclPersistentCookie');
+	const that = this;
+	const pledge = new Pledge();
+	pledge.done(callback);
 
 	Function.parallel(function session(next) {
 		Crypto.randomHex(16, next);
 	}, function token(next) {
 		Crypto.randomHex(16, next);
-	}, function done(err, result) {
-
-		var data;
+	}, async function done(err, result) {
 
 		if (err) {
-			return callback(err);
+			return pledge.reject(err);
 		}
 
-		data = {
-			identifier : result[0],
-			token      : result[1],
-			user_id    : that.$pk
-		};
+		try {
 
-		Persistent.save(data, function saved(err) {
+			let data = {
+				identifier : result[0],
+				token      : result[1],
+				user_id    : that.$pk,
+			};
 
-			if (err) {
-				return callback(err);
+			const Persistent = Model.get('AclPersistentCookie');
+			let doc = Persistent.createDocument(data);
+
+			if (alchemy.plugins.acl.has_proteus) {
+				doc.proteus_handle = that.proteus_handle;
+
+				// Register the cookie without awaiting it
+				alchemy.plugins.acl.proteus_client.registerPersistentLoginCookie(doc);
 			}
 
-			callback(null, data);
-		});
+			await doc.save();
+
+			pledge.resolve(doc);
+		} catch (err) {
+			pledge.reject(err);
+		}
 	});
+
+	return pledge;
 });

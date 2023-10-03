@@ -2,6 +2,7 @@
 
 * Make login form images configurable
 * Make the `Permissions` field inherit from `Field.Schema` & allow adding custom fields
+* Add support for logging in with `Proteus` remote auth server
 
 ## 0.8.3 (2022-11-02)
 
