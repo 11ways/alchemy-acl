@@ -5,34 +5,59 @@
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.4
  */
-const Permissions = Function.inherits('Alchemy.Field', 'Permissions');
+const Permissions = Function.inherits('Alchemy.Field.Schema', function Permissions(schema, name, options) {
+
+	let permissions_schema = alchemy.createSchema();
+
+	permissions_schema.addField('permission', 'String');
+	permissions_schema.addField('value', 'Boolean');
+
+	if (!options) {
+		options = {};
+	}
+
+	// A custom schema should NOT be passed to this class, this class uses
+	// a fixed schema that should not be altered.
+	// But because that's exactly what happens when cloning (like preparing
+	// the data to be sent to Hawkejs) we have to allow it anyway
+	if (!options.schema) {
+
+		if (options.extra_fields?.length) {
+			for (let entry of options.extra_fields) {
+
+				if (!entry.name || !entry.type) {
+					continue;
+				}
+
+				permissions_schema.addField(entry.name, entry.type, entry.options);
+			}
+		}
+
+		options.schema = permissions_schema;
+	}
+
+	Permissions.super.call(this, schema, name, options);
+});
 
 /**
- * Set the datatype name
+ * Is this schema field always an array?
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
- * @since    0.8.0
- * @version  0.8.0
- */
-Permissions.setDatatype('object');
-
-/**
- * This field value is self-contained
+ * @since    0.8.4
+ * @version  0.8.4
  *
- * @author   Jelle De Loecker   <jelle@elevenways.be>
- * @since    0.8.0
- * @version  0.8.0
+ * @return   {Boolean}
  */
-Permissions.setSelfContained(true);
+Permissions.setProperty('force_array_contents', true);
 
 /**
  * Cast the given value to this field's type
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.4
  *
  * @param    {Mixed}   value
  *
@@ -45,30 +70,15 @@ Permissions.setMethod(function cast(value) {
 		return null;
 	}
 
-	return Blast.Classes.Alchemy.Permissions.Permissions.cast(value);
-});
+	let PermissionsClass = this.options?.permissions_class || Blast.Classes.Alchemy.Permissions.Permissions;
+	
+	let result = PermissionsClass.cast(value);
 
-/**
- * Convert value from the datasource
- *
- * @author   Jelle De Loecker   <jelle@elevenways.be>
- * @since    0.8.0
- * @version  0.8.0
- *
- * @param    {Object}   query     The original query
- * @param    {Object}   options   The original query options
- * @param    {Mixed}    value     The field value, as stored in the DB
- * @param    {Function} callback
- */
-Permissions.setMethod(function _toApp(query, options, value, callback) {
-
-	if (!value) {
-		return callback();
+	if (this.options?.group_resolver != null) {
+		result.group_resolver = this.options.group_resolver;
 	}
 
-	let result = this.cast(value);
-
-	callback(null, result);
+	return result;
 });
 
 /**
@@ -76,7 +86,7 @@ Permissions.setMethod(function _toApp(query, options, value, callback) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.4
  *
  * @param    {Mixed}        value       The field's own value
  * @param    {Object}       data        The main record
@@ -85,5 +95,50 @@ Permissions.setMethod(function _toApp(query, options, value, callback) {
  * @return   {Mixed}
  */
 Permissions.setMethod(function _toDatasource(value, data, datasource, callback) {
-	callback(null, value?.toArray?.());
+
+	// Un-cast the value from a `Permissions` instance to an array
+	value = value?.toArray?.();
+
+	_toDatasource.super.call(this, value, data, datasource, callback);
+});
+
+/**
+ * Get the fieldset for the editor
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ *
+ * @return   {Array}
+ */
+Permissions.setMethod(function getFieldset() {
+
+	let fieldset = [
+		{name: 'permission', type: 'string'},
+		{name: 'value', type: 'boolean'},
+		//{name: 'expiry'},
+	];
+
+	if (this.options?.extra_fields?.length) {
+		for (let entry of this.options.extra_fields) {
+
+			if (!entry.name) {
+				continue;
+			}
+
+			let field = this.options.schema.getField(entry.name);
+
+			if (!field) {
+				continue;
+			}
+
+			fieldset.push({
+				name    : entry.name,
+				type    : field.constructor.type_name,
+				options : field.options,
+			});
+		}
+	}
+
+	return fieldset;
 });

@@ -1,6 +1,6 @@
-const VALUE = Symbol('value'),
+const ENTRIES = Symbol('entries'),
       NODE_COUNT = Symbol('node_count'),
-	  GROUP_COUNT = Symbol('group_count');
+      GROUP_COUNT = Symbol('group_count');
 
 /**
  * Permissions
@@ -61,7 +61,7 @@ Permissions.setStatic(function conduitHasPermission(conduit, permission) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.1
+ * @version  0.8.4
  *
  * @return   {Permissions}
  */
@@ -71,7 +71,9 @@ Permissions.setStatic(function cast(value) {
 		return;
 	}
 
-	if (value instanceof Permissions) {
+	const PermissionsClass = this;
+
+	if (value instanceof PermissionsClass) {
 		return value;
 	}
 
@@ -79,7 +81,7 @@ Permissions.setStatic(function cast(value) {
 		value = [value];
 	}
 
-	return new Permissions(value);
+	return new PermissionsClass(value);
 });
 
 /**
@@ -93,6 +95,34 @@ Permissions.setStatic(function cast(value) {
  */
 Permissions.setStatic(function unDry(obj) {
 	return new this(obj.nodes);
+});
+
+/**
+ * Cast to a permissions list
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ *
+ * @type     {Function}
+ */
+Permissions.setMethod(function cast(value) {
+	return this.constructor.cast(value);
+});
+
+/**
+ * The default group resolver
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ *
+ * @type     {Function}
+ */
+Permissions.setMethod(function defaultGroupResolver(name) {
+	if (Blast.isNode) {
+		return Classes.Alchemy.Model.PermissionGroup.getGroup(name);
+	}
 });
 
 /**
@@ -156,13 +186,38 @@ Permissions.setMethod(function toDry() {
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.8.3
- * @version  0.8.3
+ * @version  0.8.4
  *
  * @return   {Permissions}
  */
 Permissions.setMethod(function flattened() {
 	let flattened = this.toArray(true);
-	return new Permissions(flattened);
+	return this.cast(flattened);
+});
+
+/**
+ * See if 1 permissions object is equal to another
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ *
+ * @return   {Boolean}
+ */
+Permissions.setMethod(Blast.alikeSymbol, function isAlike(other, seen) {
+
+	if (!other || !(other instanceof Permissions)) {
+		return false;
+	}
+
+	let this_arr = this.toArray(true),
+	    other_arr = other.toArray(true);
+
+	if (this_arr.length != other_arr.length) {
+		return false;
+	}
+
+	return Object.alike(this_arr, other_arr, seen);
 });
 
 /**
@@ -193,7 +248,7 @@ Permissions.setMethod(function toArray(flatten_groups) {
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.3
+ * @version  0.8.4
  *
  * @param    {Array}   result
  *
@@ -204,9 +259,8 @@ function _flattenGroupPermissions(target) {
 	let name;
 
 	for (name in this.groups) {
-		let group_permission = this.group_values[name];
 
-		if (!group_permission) {
+		if (!this.hasGroupPermission(name)) {
 			continue;
 		}
 
@@ -247,11 +301,12 @@ function _flattenGroupPermissions(target) {
 function _toArray(list, container_path, obj) {
 
 	let entry,
+	    node,
 	    path,
 	    key;
 
 	for (key in obj) {
-		entry = obj[key];
+		node = obj[key];
 
 		if (container_path) {
 			path = container_path + '.' + key;
@@ -259,14 +314,16 @@ function _toArray(list, container_path, obj) {
 			path = key;
 		}
 
-		if (entry[VALUE]) {
-			list.push({
-				permission : path,
-				value      : entry[VALUE],
-			});
+		if (node?.[ENTRIES]?.length) {
+			for (entry of node[ENTRIES]) {
+				list.push({
+					permission : path,
+					...entry
+				});
+			}
 		}
 
-		_toArray(list, path, entry);
+		_toArray(list, path, node);
 	}
 }
 
@@ -275,7 +332,7 @@ function _toArray(list, container_path, obj) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.4
  *
  * @param    {Array}   list
  */
@@ -290,15 +347,22 @@ Permissions.setMethod(function applyList(list) {
 
 	let target,
 	    permission,
-		count_key,
+	    count_key,
 	    pieces,
 	    entry,
-		path,
-		node;
+	    path,
+	    node;
 
 	for (entry of list) {
 		permission = entry.permission;
+
+		if (typeof permission != 'string') {
+			continue;
+		}
+
+		permission = permission.trim().toLowerCase();
 		
+		// Skip permission entries without a valid permission path
 		if (!permission) {
 			continue;
 		}
@@ -319,19 +383,36 @@ Permissions.setMethod(function applyList(list) {
 
 		if (!node) {
 			node = {
-				[VALUE] : null,
+				[ENTRIES] : [],
 			};
 
 			Object.setPath(target, path, node);
 		}
 
-		node[VALUE] = entry.value;
+		node[ENTRIES].push(entry);
 		this[count_key]++;
 	}
+});
 
-	for (let name in this.groups) {
-		this.group_values[name] = this.groups[name][VALUE];
-	}
+/**
+ * Add the given permissions and return as a new instance
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ *
+ * @param    {Permissions}   other
+ *
+ * @return   {Permissions}
+ */
+Permissions.setMethod(function concat(other) {
+
+	let this_array = JSON.clone(this.toArray(true)),
+	    other_array = JSON.clone(other.toArray(true));
+
+	let result = this.cast(this_array.concat(other_array));
+
+	return result;
 });
 
 /**
@@ -339,18 +420,18 @@ Permissions.setMethod(function applyList(list) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.4
  *
  * @param    {String}   name
  *
  * @return   {Permissions}
  */
 Permissions.setMethod(function getGlobalGroup(name) {
-
-	if (Blast.isNode) {
-		return Classes.Alchemy.Model.PermissionGroup.getGroup(name);
+	if (this.group_resolver) {
+		return this.group_resolver(name);
+	} else {
+		return this.defaultGroupResolver(name);
 	}
-
 });
 
 /**
@@ -381,7 +462,7 @@ Permissions.setMethod(function lookupPermission(permission) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.4
  *
  * @param    {String}   permission
  *
@@ -394,17 +475,28 @@ Permissions.setMethod(function lookupNonInheritedPermission(permission) {
 	}
 
 	let result,
-	    entry;
+	    entry,
+	    node;
 
 	// See if it's directly defined
-	entry = Object.path(this.nodes, permission);
+	node = Object.path(this.nodes, permission);
 
-	if (entry && entry[VALUE] != null) {
+	if (node?.[ENTRIES]?.length) {
 		result = {
 			level : 0,
 			group : null,
-			value : entry[VALUE]
+			value : null,
 		};
+
+		for (entry of node[ENTRIES]) {
+			if (entry.value) {
+				result.value = true;
+			}
+		}
+
+		if (!result.value) {
+			result.value = false;
+		}
 
 		return result;
 	}
@@ -415,14 +507,24 @@ Permissions.setMethod(function lookupNonInheritedPermission(permission) {
 	while (true) {
 		let wildcard_permission = pieces.slice(0).concat('*');
 
-		entry = Object.path(this.nodes, wildcard_permission);
+		node = Object.path(this.nodes, wildcard_permission);
 
-		if (entry && entry[VALUE] != null) {
+		if (node?.[ENTRIES]?.length) {
 			result = {
 				level : 0,
 				group : null,
-				value : entry[VALUE]
+				value : null,
 			};
+
+			for (entry of node[ENTRIES]) {
+				if (entry.value) {
+					result.value = true;
+				}
+			}
+
+			if (!result.value) {
+				result.value = false;
+			}
 
 			return result;
 		}
@@ -438,11 +540,45 @@ Permissions.setMethod(function lookupNonInheritedPermission(permission) {
 });
 
 /**
+ * Is the given group enabled?
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.4
+ * @version  0.8.4
+ *
+ * @param    {String}   group_name
+ *
+ * @return   {Boolean}
+ */
+Permissions.setMethod(function hasGroupPermission(group_name) {
+
+	let group = this.groups[group_name];
+
+	if (!group) {
+		return false;
+	}
+
+	let has_group_permission = null,
+	    entry;
+
+	if (group?.[ENTRIES]?.length) {
+		for (entry of group[ENTRIES]) {
+			if (entry.value) {
+				has_group_permission = true;
+				break;
+			}
+		}
+	}
+
+	return has_group_permission;
+});
+
+/**
  * Lookup an inherited permission
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.0
+ * @version  0.8.4
  *
  * @param    {String}   permission
  *
@@ -456,14 +592,14 @@ Permissions.setMethod(function lookupInheritedPermission(permission) {
 
 	let candidates = [],
 	    group,
-		info,
-		name;
+	    entry,
+	    info,
+	    name;
 	
 	// Iterate over all the groups this should inherit
 	for (name in this.groups) {
-		let group_permission = this.group_values[name];
-
-		if (!group_permission) {
+		
+		if (!this.hasGroupPermission(name)) {
 			continue;
 		}
 

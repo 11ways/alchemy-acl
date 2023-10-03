@@ -1,9 +1,5 @@
 <%
-fieldset = [
-	{name: 'permission', type: 'string'},
-	{name: 'value', type: 'boolean'},
-	{name: 'expiry'},
-]
+fieldset = self.dataprovider.config.getFieldset();
 %>
 <al-table
 	class="pe-table"
