@@ -1,4 +1,4 @@
-## 0.8.4 (WIP)
+## 0.8.4 (2023-10-05)
 
 * Make login form images configurable
 * Make the `Permissions` field inherit from `Field.Schema` & allow adding custom fields
