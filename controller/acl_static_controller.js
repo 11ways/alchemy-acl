@@ -28,14 +28,13 @@ AclStatic.setProperty(function proteus() {
 });
 
 /**
- * Render given view and add default variables
+ * Ensure the title has been set
  *
- * @author   Jelle De Loecker   <jelle@kipdola.be>
- * @since    0.5.3
- * @version  0.5.3
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.4
+ * @version  0.8.4
  */
-AclStatic.setMethod(function render(status, template) {
-
+AclStatic.setMethod(function ensurePageTitle() {
 	if (!this.set('pagetitle')) {
 		let page_title = alchemy.settings.page_title;
 
@@ -45,14 +44,24 @@ AclStatic.setMethod(function render(status, template) {
 
 		this.setTitle('Login | ' + (page_title || 'Alchemy'));
 	}
+});
 
+/**
+ * Render given view and add default variables
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.5.3
+ * @version  0.8.4
+ */
+AclStatic.setMethod(function render(status, template) {
+	this.ensurePageTitle();
 	return render.super.call(this, status, template);
 });
 
 /**
  * Render the proteus login form as a segment
  *
- * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.4
  * @version  0.8.4
  */
@@ -68,18 +77,19 @@ AclStatic.setAction(async function proteusLogin(conduit) {
 /**
  * Handle a proteus realm login request
  *
- * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.4
  * @version  0.8.4
  */
 AclStatic.setAction(async function proteusRealmLogin(conduit, authenticator_slug) {
+	this.ensurePageTitle();
 	return this.proteus.startLogin(conduit, authenticator_slug);
 });
 
 /**
  * Verify a proteus login
  *
- * @author   Jelle De Loecker   <jelle@kipdola.be>
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.4
  * @version  0.8.4
  */
@@ -310,7 +320,7 @@ AclStatic.setMethod(function allow(UserData, remember) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.2.0
- * @version  0.6.0
+ * @version  0.8.4
  *
  * @param    {Boolean}   tried_auth   Indicate that this was an auth attempt
  */
@@ -353,11 +363,9 @@ Conduit.setMethod(function notAuthorized(tried_auth) {
 		template = 'acl/login';
 	}
 
-	if (this.controller) {
-		this.controller.render(template);
-	} else {
-		this.render(template);
-	}
+	let controller = this.getController('AclStatic');
+
+	return controller.render(template);
 });
 
 /**
