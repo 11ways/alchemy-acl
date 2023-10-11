@@ -1,3 +1,7 @@
+## 0.8.5 (WIP)
+
+* Fix proteus users not being found on login due to wrong field name
+
 ## 0.8.4 (2023-10-05)
 
 * Make login form images configurable

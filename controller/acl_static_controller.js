@@ -91,7 +91,7 @@ AclStatic.setAction(async function proteusRealmLogin(conduit, authenticator_slug
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.4
- * @version  0.8.4
+ * @version  0.8.5
  */
 AclStatic.setAction(async function proteusVerifyLogin(conduit) {
 
@@ -120,9 +120,16 @@ AclStatic.setAction(async function proteusVerifyLogin(conduit) {
 	let identity = result.identity;
 
 	const User = Model.get('User');
+
 	let user = await User.findByValues({
-		handle : identity.handle,
+		proteus_handle : identity.handle,
 	});
+
+	if (!user && identity.uid) {
+		user = await User.findByValues({
+			proteus_uid : identity.uid,
+		});
+	}
 
 	let has_changes = false;
 
@@ -326,14 +333,13 @@ AclStatic.setMethod(function allow(UserData, remember) {
  */
 Conduit.setMethod(function notAuthorized(tried_auth) {
 
-	var afterLogin,
-	    template;
+	let template;
 
 	if (tried_auth) {
 		this.set('authError', 'Username/Password are not correct');
 	} else {
 		// Store the request
-		afterLogin = {
+		let afterLogin = {
 			url: this.url,
 			body: this.body,
 			method: this.method,
@@ -377,7 +383,7 @@ Conduit.setMethod(function notAuthorized(tried_auth) {
  */
 Conduit.setMethod(function forbidden() {
 
-	var user = this.session('UserData');
+	let user = this.session('UserData');
 
 	if (user) {
 		this.deny(403, 'Forbidden');
