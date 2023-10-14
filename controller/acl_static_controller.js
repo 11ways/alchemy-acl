@@ -87,6 +87,44 @@ AclStatic.setAction(async function proteusRealmLogin(conduit, authenticator_slug
 });
 
 /**
+ * The current user is logging in via another browser and we need to poll for the result.
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.5
+ * @version  0.8.5
+ *
+ * @param    {Conduit}  conduit
+ */
+AclStatic.setAction(async function proteusPollLogin(conduit) {
+
+	let login_session = conduit.session('proteusLoginSession');
+
+	if (!login_session?.id) {
+		return conduit.notAuthorized();
+	}
+
+	if (conduit.method == 'post') {
+		let result = await this.proteus.getLoginResult(login_session.id);
+		let redirect;
+
+		if (result?.success) {
+			redirect = alchemy.routeUrl('AclStatic#proteusVerifyLogin', {
+				rlid: login_session.id
+			});
+		}
+
+		return conduit.end({
+			finished : result?.finished,
+			success  : result?.success,
+			redirect : redirect,
+		});
+	}
+
+	this.set('polling', true);
+	this.render('acl/login');
+});
+
+/**
  * Verify a proteus login
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>

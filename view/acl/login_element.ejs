@@ -16,7 +16,9 @@
 		</style>
 	{% /if %}
 
-	{% if expose('acl_proteus_server') %}
+	{% if polling %}
+		{% include "acl/proteus_poll" %}
+	{% elseif expose('acl_proteus_server') %}
 		<% Alchemy.segment('AclStatic#proteusLogin') %>
 	{% else %}
 

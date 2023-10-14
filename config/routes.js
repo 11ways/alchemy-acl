@@ -27,6 +27,13 @@ Router.add({
 	visible_location: false,
 });
 
+Router.add({
+	name       : 'AclStatic#proteusPollLogin',
+	methods    : ['get', 'post'],
+	paths      : '/acl/proteus/poll',
+	visible_location: false,
+});
+
 // Add models to the menu deck
 if (alchemy.plugins.chimera && alchemy.plugins.chimera.menu) {
 	alchemy.plugins.chimera.menu.set('acl_group', {

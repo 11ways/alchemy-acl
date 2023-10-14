@@ -1,0 +1,49 @@
+<% script('acl_proteus_polling') %>
+
+<div class="acl-login-polling acl-login-form">
+
+	{% if login_url %}
+		<h1>{%t "acl-login-polling-url-title" %}</h1>
+
+		<p class="acl-login-polling-url">
+			{% if show_link_input %}
+				<input
+					type="text"
+					value={% login_url %}
+					readonly
+					class="acl-login-url-input"
+				>
+
+				<div class="acl-login-polling-manual-description">
+					{%t "acl-login-polling-manual-description" %}
+				</div>
+
+			{% else %}
+				<a
+					class="acl-authenticator-button"
+					href={% login_url %}
+					target="_blank"
+					data-he-link="false"
+				>{%t "acl-login-polling-url-link" %}</a>
+			{% /if %}
+		</p>
+	{% /if %}
+
+	<div class="acl-login-polling-status">
+		<div class="status-starting">
+			{%t "acl-login-polling-status-starting" %}
+		</div>
+		<div class="status-checking" hidden>
+			{%t "acl-login-polling-status-checking" %}
+		</div>
+		<div class="status-long" hidden>
+			{%t "acl-login-polling-status-long" %}
+		</div>
+		<div class="status-fail" hidden>
+			{%t "acl-login-polling-status-fail" %}
+		</div>
+		<div class="status-success" hidden>
+			{%t "acl-login-polling-status-success" %}
+		</div>
+	</div>
+</div>
