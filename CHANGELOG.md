@@ -1,4 +1,4 @@
-## 0.8.5 (WIP)
+## 0.8.5 (2023-10-15)
 
 * Fix proteus users not being found on login due to wrong field name
 * Add remote-login with polling support for Proteus
