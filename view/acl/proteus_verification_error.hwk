@@ -1,0 +1,43 @@
+<% config = expose('acl-view-setting') %>
+<% expands(config.bodylayout) %>
+<% style('login') %>
+
+<% start(config.mainblock) %>
+	<div class="form-container acl-login-form-container">
+
+		{% if expose('acl_login_logo') %}
+			<img
+				!Media={% expose('acl_login_logo') %}
+				class="logo acl-login-logo"
+				alt="Logo"
+			>
+		{% /if %}
+
+		{% if expose('acl_background_logo') %}
+			<style>
+				:root {
+					--acl-background-logo: url('{{ expose('acl_background_logo') }}');
+				}
+			</style>
+		{% /if %}
+
+		<div class="acl-verification-error acl-login-form">
+
+			<h1>{%t "acl-verification-error-title" error_type=verification_error_type %}</h1>
+
+			<div class="acl-verification-error-content">
+
+				<div class="acl-verification-error-description">
+					{%t "acl-verification-error-description" error_type=verification_error_type %}
+				</div>
+
+				<a
+					!Route="LoginForm"
+					class="acl-authenticator-button"
+				>
+					{%t "login" %}
+				</a>
+			</div>
+		</div>
+	</div>
+<% end(config.mainblock) %>

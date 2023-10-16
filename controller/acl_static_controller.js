@@ -125,34 +125,46 @@ AclStatic.setAction(async function proteusPollLogin(conduit) {
 });
 
 /**
+ * Show a verificatin error
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.8.6
+ * @version  0.8.6
+ */
+AclStatic.setMethod(function showVerificationError(type) {
+	this.set('verification_error_type', type);
+	this.render('acl/proteus_verification_error');
+});
+
+/**
  * Verify a proteus login
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.4
- * @version  0.8.5
+ * @version  0.8.6
  */
 AclStatic.setAction(async function proteusVerifyLogin(conduit) {
 
 	let rlid = conduit.param('rlid');
 
 	if (!rlid) {
-		return conduit.notAuthorized();
+		return this.showVerificationError('no_rlid');
 	}
 
 	let login_session = conduit.session('proteusLoginSession');
 
 	if (!login_session) {
-		return conduit.notAuthorized();
+		return this.showVerificationError('no_session');
 	}
 
 	if (login_session.id != rlid) {
-		return conduit.notAuthorized();
+		return this.showVerificationError('wrong_rlid');
 	}
 
 	let result = await this.proteus.getLoginResult(rlid);
 
 	if (!result?.success || !result?.identity) {
-		return conduit.notAuthorized();
+		return this.showVerificationError('no_success');
 	}
 
 	let identity = result.identity;
