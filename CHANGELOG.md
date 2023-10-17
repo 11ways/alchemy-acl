@@ -1,6 +1,7 @@
 ## 0.8.6 (WIP)
 
 * Add proteus verification-error page (shown when a remote login fails)
+* Decouple some of the proteus logic from the global settings
 
 ## 0.8.5 (2023-10-15)
 

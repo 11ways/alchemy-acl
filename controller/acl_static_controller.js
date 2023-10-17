@@ -167,33 +167,7 @@ AclStatic.setAction(async function proteusVerifyLogin(conduit) {
 		return this.showVerificationError('no_success');
 	}
 
-	let identity = result.identity;
-
-	const User = Model.get('User');
-
-	let user = await User.findByValues({
-		proteus_handle : identity.handle,
-	});
-
-	if (!user && identity.uid) {
-		user = await User.findByValues({
-			proteus_uid : identity.uid,
-		});
-	}
-
-	let has_changes = false;
-
-	if (!user) {
-		user = User.createDocument();
-		has_changes = true;
-
-		// Also try to use the same primary ket as Proteus
-		user._id = identity._id;
-	}
-
-	await this.proteus.updateUserWithProteusInfo(user, result);
-
-	conduit.session('proteusLoginSession', null);
+	let user = await this.proteus.handleSuccessfulLoginResult(conduit, result);
 
 	return this.allow(user, true);
 });
