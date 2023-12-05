@@ -1,6 +1,10 @@
 <div class="acl-login-form">
 	<h1>{%t "acl-login-form-title" %}</h1>
 
+	{% if proteus_error %}
+		<p class="auth-error">{{ proteus_error }}</p>
+	{% /if %}
+
 	{% if authError %}
 		<p class="auth-error">{{ authError }}</p>
 	{% /if %}

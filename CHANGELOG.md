@@ -1,3 +1,7 @@
+## 0.8.7 (WIP)
+
+* Show useful error when communication fails with proteus server
+
 ## 0.8.6 (2023-10-17)
 
 * Add proteus verification-error page (shown when a remote login fails)

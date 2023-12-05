@@ -63,11 +63,17 @@ AclStatic.setMethod(function render(status, template) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.4
- * @version  0.8.4
+ * @version  0.8.7
  */
 AclStatic.setAction(async function proteusLogin(conduit) {
 
-	let authenticators = await this.proteus.getAuthenticators();
+	let authenticators;
+
+	try {
+		authenticators = await this.proteus.getAuthenticators();
+	} catch (err) {
+		this.set('proteus_error', this.proteus.getPublicErrorMessage(err));
+	}
 
 	this.set('authenticators', authenticators);
 
