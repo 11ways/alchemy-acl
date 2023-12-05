@@ -14,29 +14,24 @@ let bcrypt = alchemy.use('bcrypt');
  * @since    0.0.1
  * @version  0.7.2
  */
-var User = Function.inherits('Alchemy.Model', 'User');
-
-/**
- * The default field to display is the 'username' one
- *
- * @author   Jelle De Loecker   <jelle@elevenways.be>
- * @since    0.2.0
- * @version  0.8.3
- */
-User.setProperty('display_field', 'username');
+const User = Function.inherits('Alchemy.Model', 'User');
 
 /**
  * Constitute the class wide schema
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.2.0
- * @version  0.8.0
+ * @version  0.8.7
  */
 User.constitute(function addFields() {
+
+	let has_displayfield = this.prototype.hasOwnProperty('display_field'),
+	    display_field;
 
 	this.addField('username', 'String');
 
 	if (alchemy.plugins.acl.has_proteus) {
+		display_field = 'title';
 
 		this.addField('title', 'String', {
 			description : 'The text that will be used to represent this record',
@@ -73,10 +68,16 @@ User.constitute(function addFields() {
 		});
 
 	} else {
+		display_field = 'username';
+
 		this.addField('password', 'Password', {is_private: true});
 
 		// If the user is still enabled
 		this.addField('enabled', 'Boolean', {default: true});
+	}
+
+	if (!has_displayfield) {
+		this.setProperty('display_field', display_field);
 	}
 
 	// The user's permissions
