@@ -1,4 +1,4 @@
-## 0.8.7 (WIP)
+## 0.8.7 (2024-01-14)
 
 * Show useful error when communication fails with proteus server
 * Use correct displayfield for user models
