@@ -1,5 +1,5 @@
 // Don't load this file if a user model already exists
-if (Classes.Alchemy.Model.User || alchemy.plugins.acl.custom_model) {
+if (Classes.Alchemy.Model.User) {
 	return;
 }
 
@@ -14,14 +14,14 @@ let bcrypt = alchemy.use('bcrypt');
  * @since    0.0.1
  * @version  0.7.2
  */
-const User = Function.inherits('Alchemy.Model', 'User');
+const User = Function.inherits('Alchemy.Model.App', 'User');
 
 /**
  * Constitute the class wide schema
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.2.0
- * @version  0.8.7
+ * @version  0.9.0
  */
 User.constitute(function addFields() {
 
@@ -30,73 +30,66 @@ User.constitute(function addFields() {
 
 	this.addField('username', 'String');
 
-	if (alchemy.plugins.acl.has_proteus) {
-		display_field = 'title';
+	STAGES.getStage('settings.to_object').addPostTask(() => {
 
-		this.addField('title', 'String', {
-			description : 'The text that will be used to represent this record',
+		if (alchemy.plugins.acl.has_proteus) {
+			display_field = 'title';
+
+			this.addField('title', 'String', {
+				description : 'The text that will be used to represent this record',
+			});
+
+			this.addField('proteus_uid', 'BigInt', {
+				description : 'The unique identifier number',
+			});
+		
+			this.addField('proteus_handle', 'String', {
+				description : 'The human-readable representation of the identifier',
+			});
+		
+			this.addField('nickname', 'String', {
+				description : 'A nickname for this user',
+			});
+		
+			this.addField('given_name', 'String', {
+				description : 'The given name of this user',
+			});
+		
+			this.addField('family_name', 'String', {
+				description : 'The family name of this user'
+			});
+
+			this.addIndex('proteus_uid', {
+				unique : true,
+				sparse : true,
+			});
+
+			this.addIndex('proteus_handle', {
+				unique : true,
+				sparse : true,
+			});
+
+		} else {
+			display_field = 'username';
+
+			this.addField('password', 'Password', {is_private: true});
+
+			// If the user is still enabled
+			this.addField('enabled', 'Boolean', {default: true});
+		}
+
+		if (!has_displayfield) {
+			this.setProperty('display_field', display_field);
+		}
+
+		// The user's permissions
+		this.addField('permissions', 'Permissions');
+
+		// The user's settings
+		this.addField('settings', 'Settings', {
+			setting_group: Plugin.USER_SETTINGS,
 		});
-
-		this.addField('proteus_uid', 'BigInt', {
-			description : 'The unique identifier number',
-		});
-	
-		this.addField('proteus_handle', 'String', {
-			description : 'The human-readable representation of the identifier',
-		});
-	
-		this.addField('nickname', 'String', {
-			description : 'A nickname for this user',
-		});
-	
-		this.addField('given_name', 'String', {
-			description : 'The given name of this user',
-		});
-	
-		this.addField('family_name', 'String', {
-			description : 'The family name of this user'
-		});
-
-		this.addIndex('proteus_uid', {
-			unique : true,
-			sparse : true,
-		});
-
-		this.addIndex('proteus_handle', {
-			unique : true,
-			sparse : true,
-		});
-
-	} else {
-		display_field = 'username';
-
-		this.addField('password', 'Password', {is_private: true});
-
-		// If the user is still enabled
-		this.addField('enabled', 'Boolean', {default: true});
-	}
-
-	if (!has_displayfield) {
-		this.setProperty('display_field', display_field);
-	}
-
-	// The user's permissions
-	this.addField('permissions', 'Permissions');
-
-	let field,
-	    i;
-
-	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
-		field = alchemy.plugins.acl.userModelFields[i];
-
-		this.addField.apply(this, field);
-	}
-
-	this.hasAndBelongsToMany('AclGroup');
-
-	if (typeof alchemy.plugins.acl.addFields == 'function') {
-		alchemy.plugins.acl.addFields.call(this);
-	}
+	});
 });
 
 /**
@@ -104,7 +97,7 @@ User.constitute(function addFields() {
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.2.0
- * @version  0.8.3
+ * @version  0.9.0
  */
 User.constitute(function chimeraConfig() {
 
@@ -112,38 +105,34 @@ User.constitute(function chimeraConfig() {
 		return;
 	}
 
-	let list = this.chimera.getActionFields('list'),
-	    edit = this.chimera.getActionFields('edit');
+	STAGES.getStage('settings.to_object').addPostTask(() => {
 
-	if (alchemy.plugins.acl.has_proteus) {
-		list.addField('proteus_handle', {readonly: true});
-		list.addField('nickname', {readonly: true});
-		list.addField('given_name', {readonly: true});
-		list.addField('family_name', {readonly: true});
+		let list = this.chimera.getActionFields('list'),
+			edit = this.chimera.getActionFields('edit');
 
-		edit.addField('proteus_handle', {readonly: true});
-		edit.addField('nickname', {readonly: true});
-		edit.addField('given_name', {readonly: true});
-		edit.addField('family_name', {readonly: true});
-		edit.addField('permissions', {readonly: true});
-	} else {
-		list.addField('username');
-		list.addField('enabled');
+		if (alchemy.plugins.acl.has_proteus) {
+			list.addField('proteus_handle', {readonly: true});
+			list.addField('nickname', {readonly: true});
+			list.addField('given_name', {readonly: true});
+			list.addField('family_name', {readonly: true});
 
-		edit.addField('username');
-		edit.addField('password');
-		edit.addField('enabled');
-		edit.addField('permissions');
-		edit.addField('acl_group_id');
-	}
+			edit.addField('proteus_handle', {readonly: true});
+			edit.addField('nickname', {readonly: true});
+			edit.addField('given_name', {readonly: true});
+			edit.addField('family_name', {readonly: true});
+			edit.addField('permissions', {readonly: true});
+		} else {
+			list.addField('username');
+			list.addField('enabled');
 
-	let field,
-	    i;
+			edit.addField('username');
+			edit.addField('password');
+			edit.addField('enabled');
+			edit.addField('permissions');
+		}
 
-	for (i = 0; i < alchemy.plugins.acl.userModelFields.length; i++) {
-		field = alchemy.plugins.acl.userModelFields[i];
-		edit.addField(field[0]);
-	}
+		edit.addField('settings');
+	});
 });
 
 /**
