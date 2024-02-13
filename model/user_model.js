@@ -171,7 +171,7 @@ User.setMethod(async function beforeSave(document, options) {
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
  * @since    0.2.0
- * @version  0.2.0
+ * @version  0.9.0
  *
  * @param    {String}   existing   The existing session to remove
  * @param    {Function} callback
@@ -205,7 +205,7 @@ User.setDocumentMethod(function createPersistentCookie(existing, callback) {
 				user_id    : that.$pk,
 			};
 
-			const Persistent = Model.get('AclPersistentCookie');
+			const Persistent = Model.get('Acl.PersistentCookie');
 			let doc = Persistent.createDocument(data);
 
 			if (alchemy.plugins.acl.has_proteus) {

@@ -10,7 +10,7 @@ let reloading_pledge;
  * @since    0.8.0
  * @version  0.8.0
  */
-const Group = Function.inherits('Alchemy.Model', 'PermissionGroup');
+const Group = Function.inherits('Alchemy.Model.Acl', 'PermissionGroup');
 
 /**
  * Get a group by its name

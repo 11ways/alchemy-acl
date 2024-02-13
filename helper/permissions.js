@@ -115,13 +115,13 @@ Permissions.setMethod(function cast(value) {
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.8.4
- * @version  0.8.4
+ * @version  0.9.0
  *
  * @type     {Function}
  */
 Permissions.setMethod(function defaultGroupResolver(name) {
 	if (Blast.isNode) {
-		return Classes.Alchemy.Model.PermissionGroup.getGroup(name);
+		return Classes.Alchemy.Model.Acl.PermissionGroup.getGroup(name);
 	}
 });
 

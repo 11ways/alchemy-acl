@@ -1,5 +1,5 @@
 /**
- * The AclPersistentCookie Model class
+ * The Acl.PersistentCookie Model class
  *
  * @constructor
  *
@@ -7,7 +7,7 @@
  * @since    0.0.1
  * @version  0.5.0
  */
-const Persistent = Function.inherits('Alchemy.Model', 'AclPersistentCookie');
+const Persistent = Function.inherits('Alchemy.Model.Acl', 'PersistentCookie');
 
 /**
  * Constitute the class wide schema
