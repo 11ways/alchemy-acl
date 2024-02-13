@@ -1,8 +1,8 @@
 <% config = expose('acl-view-setting') %>
-<% expands(config.bodylayout) %>
+<% expands(config.body_layout) %>
 <% style('login') %>
 
-<% start(config.mainblock) %>
+<% start(config.main_block) %>
 	<div class="form-container acl-login-form-container">
 
 		{% if expose('acl_login_logo') %}
@@ -40,4 +40,4 @@
 			</div>
 		</div>
 	</div>
-<% end(config.mainblock) %>
+<% end(config.main_block) %>
