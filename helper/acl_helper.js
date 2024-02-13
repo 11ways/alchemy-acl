@@ -7,9 +7,7 @@
  *
  * @param    {ViewRender}    view
  */
-var Acl = Function.inherits('Alchemy.Helper', function Acl(view) {
-	Acl.super.call(this, view);
-});
+const Acl = Function.inherits('Alchemy.Helper', 'Acl');
 
 /**
  * Get the data object
@@ -171,4 +169,30 @@ Acl.setMethod(function hasPermission(permission) {
 	}
 
 	return false;
+});
+
+/**
+ * Get a setting value
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.9.0
+ * @version  0.9.0
+ *
+ * @param    {string}   path
+ *
+ * @return   {*}
+ */
+Acl.setMethod(function getSetting(path) {
+
+	let result;
+
+	if (this.data && this.data.settings) {
+		result = this.data.settings.getPath(path);
+
+		if (result) {
+			result = result.toSimple();
+		}
+	}
+
+	return result;
 });
