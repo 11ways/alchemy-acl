@@ -212,7 +212,7 @@ AclStatic.setAction(function loginForm(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.0.1
- * @version  0.8.4
+ * @version  0.9.0
  */
 AclStatic.setAction(function loginPost(conduit) {
 
@@ -221,8 +221,8 @@ AclStatic.setAction(function loginPost(conduit) {
 		return conduit.notAuthorized();
 	}
 
-	let username = conduit.body[alchemy.plugins.acl.username];
-	let password = conduit.body[alchemy.plugins.acl.password];
+	let username = conduit.body[alchemy.settings.plugins.acl.model.username_field];
+	let password = conduit.body[alchemy.settings.plugins.acl.model.password_field];
 
 	if (!username || !password) {
 		return conduit.notAuthorized();
@@ -233,7 +233,7 @@ AclStatic.setAction(function loginPost(conduit) {
 	    remember = conduit.body.remember === 'on',
 	    crit = User.find();
 
-	crit.where(alchemy.plugins.acl.username).equals(username);
+	crit.where(alchemy.settings.plugins.acl.model.username_field).equals(username);
 
 	User.find('first', crit, function gotUser(err, record) {
 
@@ -279,14 +279,14 @@ AclStatic.setAction(function loginPost(conduit) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.6.0
+ * @version  0.9.0
  */
 AclStatic.setAction(function logout() {
 
 	var redirect_url,
 	    fingerprint = this.conduit.fingerprint;
 
-	if (alchemy.plugins.acl.destroy_session_on_logout) {
+	if (alchemy.settings.plugins.acl.destroy_session_on_logout) {
 		let session = this.conduit.getSession(false);
 
 		if (session) {
@@ -322,10 +322,10 @@ AclStatic.setAction(function logout() {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.0.1
- * @version  0.2.0
+ * @version  0.9.0
  *
- * @param    {UserDocument}   UserData
- * @param    {Boolean}        remember
+ * @param    {Document.User}   UserData
+ * @param    {Boolean}         remember
  */
 AclStatic.setMethod(function allow(UserData, remember) {
 
@@ -340,7 +340,7 @@ AclStatic.setMethod(function allow(UserData, remember) {
 	}
 
 	// Store the userdata in the session
-	this.session('UserData', UserData);
+	Plugin.addUserDataToSession(this.conduit, UserData);
 
 	if (remember) {
 		UserData.createPersistentCookie(function gotCookie(err, result) {
@@ -357,7 +357,7 @@ AclStatic.setMethod(function allow(UserData, remember) {
  *
  * @author   Jelle De Loecker   <jelle@kipdola.be>
  * @since    0.2.0
- * @version  0.8.4
+ * @version  0.9.0
  *
  * @param    {Boolean}   tried_auth   Indicate that this was an auth attempt
  */
@@ -384,11 +384,11 @@ Conduit.setMethod(function notAuthorized(tried_auth) {
 	this.status = 401;
 
 	if (this.ajax) {
-		template = alchemy.plugins.acl.not_authorized_ajax_template;
+		template = alchemy.settings.plugins.acl.layout.not_authorized_ajax_template;
 	}
 
 	if (!template) {
-		template = alchemy.plugins.acl.not_authorized_template;
+		template = alchemy.settings.plugins.acl.layout.not_authorized_template;
 	}
 
 	if (!template) {

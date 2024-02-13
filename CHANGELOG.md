@@ -1,3 +1,7 @@
+## 0.9.0 (WIP)
+
+* Upgrade to alchemy v1.4.0
+
 ## 0.8.7 (2024-01-14)
 
 * Show useful error when communication fails with proteus server
