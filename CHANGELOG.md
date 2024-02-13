@@ -1,6 +1,8 @@
 ## 0.9.0 (WIP)
 
 * Upgrade to alchemy v1.4.0
+* Use `Acl` model namespace for most models
+* Update a user's session data when updating the user record
 
 ## 0.8.7 (2024-01-14)
 

@@ -167,6 +167,20 @@ User.setMethod(async function beforeSave(document, options) {
 });
 
 /**
+ * Update the session data for this user
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.9.0
+ * @version  0.9.0
+ *
+ * @param    {Object}   data
+ */
+User.setMethod(function afterSave(data) {
+	let doc = this.createDocument(data);
+	Plugin.updateUserDataSessions(doc);
+});
+
+/**
  * Constitute the class wide schema
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
