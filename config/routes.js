@@ -70,7 +70,45 @@ if (alchemy.plugins.chimera && alchemy.plugins.chimera.menu) {
  */
 Router.use(function persistentLoginCheck(req, res, next) {
 
-	var conduit = req.conduit;
+	const conduit = req.conduit;
+
+	if (alchemy.settings.environment != 'live' && alchemy.settings.force_user_login) {
+		conduit.getModel('User').findById(alchemy.settings.force_user_login, function gotUser(err, user) {
+
+			if (err) {
+				console.log('Failed to login test user', err);
+				return doACPLCheck(conduit, next);
+			}
+
+			if (!user) {
+				console.log('Could not find test user ' + alchemy.settings.force_user_login);
+				return doACPLCheck(conduit, next);
+			}
+
+			try {
+				Plugin.addUserDataToSession(conduit, user);
+			} catch (err) {
+				console.log('Failed to login test user', err);
+				return doACPLCheck(conduit, next);
+			}
+
+			next();
+		});
+
+		return;
+	}
+
+	return doACPLCheck(conduit, next);
+}, {weight: 99999});
+
+/**
+ * Do the ACPL check
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.9.0
+ * @version  0.9.0
+ */
+function doACPLCheck(conduit, next) {
 
 	// Do nothing if userdata is already set
 	if (conduit.getSession(false) && conduit.session('UserData')) {
@@ -80,42 +118,24 @@ Router.use(function persistentLoginCheck(req, res, next) {
 	// Get the persistent cookie
 	let acpl = conduit.cookie('acpl');
 
-	if (acpl) {
-		let Persistent = conduit.getModel('Acl.PersistentCookie');
-
-		Pledge.done(Persistent.getUserFromCookieForLogin(conduit, acpl), (err, user) => {
-
-			if (err || !user) {
-				return next();
-			}
-
-			Plugin.addUserDataToSession(conduit, user);
-
-			if (typeof user.onAcplLogin == 'function') {
-				user.onAcplLogin(conduit);
-			}
-
-			next();
-		});
-	} else {
-		if (alchemy.settings.environment != 'live' && alchemy.settings.force_user_login) {
-			conduit.getModel('User').findById(alchemy.settings.force_user_login, function gotUser(err, user) {
-
-				if (err) {
-					console.log('Failed to login test user');
-					return next();
-				}
-
-				if (!user) {
-					console.log('Could not find test user ' + alchemy.settings.force_user_login);
-					return next();
-				}
-
-				Plugin.addUserDataToSession(conduit, user);
-				next();
-			});
-		} else {
-			next();
-		}
+	if (!acpl) {
+		return next();
 	}
-}, {weight: 99999});
+
+	let Persistent = conduit.getModel('Acl.PersistentCookie');
+
+	Pledge.done(Persistent.getUserFromCookieForLogin(conduit, acpl), (err, user) => {
+
+		if (err || !user) {
+			return next();
+		}
+
+		Plugin.addUserDataToSession(conduit, user);
+
+		if (typeof user.onAcplLogin == 'function') {
+			user.onAcplLogin(conduit);
+		}
+
+		next();
+	});
+}

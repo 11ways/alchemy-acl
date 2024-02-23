@@ -1,6 +1,7 @@
 ## 0.9.0-alpha.2 (WIP)
 
 * Fix JSON-ified representation of `Permissions` not being handled by its `cast` method properly
+* On development, always give preference to the `force_user_login` setting
 
 ## 0.9.0-alpha.1 (2024-02-15)
 
