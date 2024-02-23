@@ -1,3 +1,7 @@
+## 0.9.0-alpha.2 (WIP)
+
+* Fix JSON-ified representation of `Permissions` not being handled by its `cast` method properly
+
 ## 0.9.0-alpha.1 (2024-02-15)
 
 * Upgrade to alchemy v1.4.0

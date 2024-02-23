@@ -61,7 +61,7 @@ Permissions.setStatic(function conduitHasPermission(conduit, permission) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.4
+ * @version  0.9.0
  *
  * @return   {Permissions}
  */
@@ -78,7 +78,11 @@ Permissions.setStatic(function cast(value) {
 	}
 
 	if (!Array.isArray(value)) {
-		value = [value];
+		if (Array.isArray(value.nodes)) {
+			value = value.nodes;
+		} else {
+			value = [value];
+		}
 	}
 
 	return new PermissionsClass(value);
