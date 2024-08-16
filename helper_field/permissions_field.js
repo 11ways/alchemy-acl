@@ -9,11 +9,6 @@
  */
 const Permissions = Function.inherits('Alchemy.Field.Schema', function Permissions(schema, name, options) {
 
-	let permissions_schema = alchemy.createSchema();
-
-	permissions_schema.addField('permission', 'String');
-	permissions_schema.addField('value', 'Boolean');
-
 	if (!options) {
 		options = {};
 	}
@@ -23,6 +18,11 @@ const Permissions = Function.inherits('Alchemy.Field.Schema', function Permissio
 	// But because that's exactly what happens when cloning (like preparing
 	// the data to be sent to Hawkejs) we have to allow it anyway
 	if (!options.schema) {
+
+		let permissions_schema = alchemy.createSchema();
+
+		permissions_schema.addField('permission', 'String');
+		permissions_schema.addField('value', 'Boolean');
 
 		if (options.extra_fields?.length) {
 			for (let entry of options.extra_fields) {
@@ -86,20 +86,19 @@ Permissions.setMethod(function cast(value) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.8.0
- * @version  0.8.4
+ * @version  0.9.0
  *
- * @param    {Mixed}        value       The field's own value
- * @param    {Object}       data        The main record
- * @param    {Datasource}   datasource  The datasource instance
+ * @param    {Alchemy.OperationalContext.SaveFieldToDatasource}   context
+ * @param    {*} value
  *
- * @return   {Mixed}
+ * @return   {Pledge<*>|*}
  */
-Permissions.setMethod(function _toDatasource(value, data, datasource, callback) {
+Permissions.setMethod(function _toDatasource(context, value) {
 
 	// Un-cast the value from a `Permissions` instance to an array
 	value = value?.toArray?.();
 
-	_toDatasource.super.call(this, value, data, datasource, callback);
+	return _toDatasource.super.call(this, context, value);
 });
 
 /**

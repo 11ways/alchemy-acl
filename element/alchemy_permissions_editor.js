@@ -37,7 +37,7 @@ PermissionsEditor.addElementGetter('table_element', 'al-table.pe-table');
  * @since    0.8.0
  * @version  0.8.3
  */
-PermissionsEditor.setProperty(function value(value) {
+PermissionsEditor.setProperty(function value() {
 
 	let result = [],
 	    rows = this.table_element.queryAllNotNested('tbody tr'),
