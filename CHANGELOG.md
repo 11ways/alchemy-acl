@@ -1,4 +1,8 @@
-## 0.9.0-alpha.3 (WIP)
+## 0.9.0-alpha.4 (WIP)
+
+* Add `logged-in` class to the HTML element when a user is logged in
+
+## 0.9.0-alpha.3 (2024-08-16)
 
 * Implement Alchemy v1.4 `Field` changes
 

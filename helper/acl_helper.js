@@ -10,6 +10,35 @@
 const Acl = Function.inherits('Alchemy.Helper', 'Acl');
 
 /**
+ * Function to execute on the client side, when the scene is made.
+ * Adds the 'logged-in' class to the html element if user is logged in.
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.9.0
+ * @version  0.9.0
+ *
+ * @param    {Scene}   scene
+ * @param    {Object}  options
+ */
+Acl.setStatic(function onScene(scene, renderer) {
+
+	let acl_data;
+
+	// Try to get the data via the get method if available
+	if (renderer?.expose_to_scene?.get) {
+		acl_data = renderer.expose_to_scene.get('acl-user-data');
+	} else if (renderer?.expose_to_scene) {
+		acl_data = renderer.expose_to_scene['acl-user-data'];
+	}
+
+	if (acl_data && acl_data._id) {
+		document.documentElement.classList.add('logged-in');
+	} else {
+		document.documentElement.classList.remove('logged-in');
+	}
+});
+
+/**
  * Get the data object
  *
  * @author   Jelle De Loecker   <jelle@develry.be>
