@@ -1,4 +1,8 @@
-## 0.9.0-alpha.4 (WIP)
+## 0.9.0 (2026-01-21)
+
+* Upgrade to bcrypt 6.0.0
+
+## 0.9.0-alpha.4
 
 * Add `logged-in` class to the HTML element when a user is logged in
 
