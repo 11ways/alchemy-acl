@@ -102,40 +102,61 @@ Router.use(function persistentLoginCheck(req, res, next) {
 }, {weight: 99999});
 
 /**
- * Do the ACPL check
+ * Do the ACPL check (callback version)
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.9.0
  * @version  0.9.0
  */
 function doACPLCheck(conduit, next) {
+	Pledge.done(doACPLCheckAsync(conduit), () => next());
+}
+
+/**
+ * Do the ACPL check.
+ * Checks for a persistent login cookie and restores the session if valid.
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.9.0
+ * @version  0.9.0
+ */
+async function doACPLCheckAsync(conduit) {
 
 	// Do nothing if userdata is already set
 	if (conduit.getSession(false) && conduit.session('UserData')) {
-		return next();
+		return;
 	}
 
 	// Get the persistent cookie
 	let acpl = conduit.cookie('acpl');
 
 	if (!acpl) {
-		return next();
+		return;
 	}
 
 	let Persistent = conduit.getModel('Acl.PersistentCookie');
+	let user = await Persistent.getUserFromCookieForLogin(conduit, acpl);
 
-	Pledge.done(Persistent.getUserFromCookieForLogin(conduit, acpl), (err, user) => {
+	if (!user) {
+		return;
+	}
 
-		if (err || !user) {
-			return next();
-		}
+	Plugin.addUserDataToSession(conduit, user);
 
-		Plugin.addUserDataToSession(conduit, user);
-
-		if (typeof user.onAcplLogin == 'function') {
-			user.onAcplLogin(conduit);
-		}
-
-		next();
-	});
+	if (typeof user.onAcplLogin == 'function') {
+		user.onAcplLogin(conduit);
+	}
 }
+
+/**
+ * Restore persistent login when a WebSocket session is created.
+ * This handles the case where the server restarts and the session is lost,
+ * but the browser still has the persistent login cookie.
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.9.0
+ * @version  0.9.0
+ */
+alchemy.on('restoring_websocket_session', async function onRestoringWebsocketSession(conduit) {
+	await doACPLCheckAsync(conduit);
+});

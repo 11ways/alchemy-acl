@@ -1,6 +1,7 @@
 ## 0.9.0 (2026-01-21)
 
 * Upgrade to bcrypt 6.0.0
+* Add a Promise-based implementation of the ACPL check
 
 ## 0.9.0-alpha.4
 
